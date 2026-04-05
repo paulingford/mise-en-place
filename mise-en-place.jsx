@@ -1438,10 +1438,32 @@ const ProfileTab = ({dishes}) => (
   </div>
 );
 
+const MISE_STORAGE_KEY = "mise-app-state";
+const loadPersistedState = () => {
+  try {
+    if (typeof localStorage === "undefined") return null;
+    const raw = localStorage.getItem(MISE_STORAGE_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    if (!p || !Array.isArray(p.dishes)) return null;
+    return {
+      dishes: p.dishes,
+      weekDishIds: Array.isArray(p.weekDishIds) ? p.weekDishIds.filter((id) => typeof id === "string") : [],
+    };
+  } catch {
+    return null;
+  }
+};
+
+const __miseHydrated = (() => {
+  const p = loadPersistedState();
+  return p ? { dishes: p.dishes, weekDishIds: p.weekDishIds } : { dishes: INITIAL_DISHES, weekDishIds: [] };
+})();
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [dishes, setDishes] = useState(INITIAL_DISHES);
-  const [weekDishIds, setWeekDishIds] = useState([]);
+  const [dishes, setDishes] = useState(__miseHydrated.dishes);
+  const [weekDishIds, setWeekDishIds] = useState(__miseHydrated.weekDishIds);
   const [activeTab, setActiveTab] = useState("recipes");
   const mainScrollRef = useRef(null);
   const [detailDish, setDetailDish] = useState(null);
@@ -1481,6 +1503,14 @@ export default function App() {
     meta.content="width=device-width, initial-scale=1, maximum-scale=1";
     return ()=>{meta.content="width=device-width, initial-scale=1";};
   },[]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(MISE_STORAGE_KEY, JSON.stringify({ dishes, weekDishIds }));
+    } catch {
+      /* private mode / quota */
+    }
+  }, [dishes, weekDishIds]);
 
   return (
     <div style={{display:"flex",flexDirection:"column",height:"100vh",background:"#fff",fontFamily:T.font,width:"100%",maxWidth:680,margin:"0 auto",position:"relative",overflow:"hidden",boxShadow:"0 0 0 1px rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.08)"}}>
