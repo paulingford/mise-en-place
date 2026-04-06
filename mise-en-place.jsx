@@ -38,6 +38,20 @@ const sourceName = (url) => {
   } catch { return ""; }
 };
 
+/** Normalize recipe image hrefs from imports (absolute URL or resolve relative to recipe page). */
+const resolveRecipeImageUrl = (image, pageUrl) => {
+  if (!image || typeof image !== "string") return "";
+  const u = image.trim();
+  if (!u) return "";
+  try {
+    if (u.startsWith("//")) return `https:${u}`;
+    if (/^https?:\/\//i.test(u)) return u;
+    return new URL(u, pageUrl).href;
+  } catch {
+    return "";
+  }
+};
+
 // ─── Dish model
 // groups: array of group objects, each one of:
 //   {type:"component", componentId, label, extras:[], note}   — references canonical component
@@ -424,8 +438,13 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
         ? "\nActive this week: " + activeCompIds.map(function(id){ return COMPONENT_LIBRARY[id] ? COMPONENT_LIBRARY[id].name : id; }).join(", ")
         : "";
 
-      var prompt = "Adapt the recipe at this URL into a component-based dish format. Use your training knowledge.\n\n"
+      var prompt = "Adapt the recipe at this URL into a component-based dish format. Use your training knowledge of the page.\n\n"
         + "URL: " + url.trim() + "\n\n"
+        + "SOURCE RULES (critical):\n"
+        + "- Ingredients: copy ONLY lines from the article's main recipe **Ingredients** section (the publisher's list: bullets, checkboxes, or structured ingredient list). Do not add items from comments, reviews, reader tips, substitutions, forum replies, or discussion threads.\n"
+        + "- Instructions: use ONLY steps from the article's main **Instructions** / **Method** / **Directions** section written by the publisher. Do not paste advice, variations, or steps from comments or user Q&A.\n"
+        + "- Ignore all other page text: blog intros, headnotes, stories, personal anecdotes, general tips callouts, equipment or technique essays, serving or pairing commentary, SEO blurbs, and any narrative that sits outside the structured ingredient list or numbered/bulleted instruction steps.\n"
+        + "- If text could be either the real recipe or a comment, exclude it.\n\n"
         + "Component library (use exact id values as componentId):\n"
         + compLines + activeList + "\n\n"
         + "Return ONLY a JSON object, no markdown, no explanation. Fields: "
@@ -435,8 +454,11 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
         + "{type:'component', componentId, label, note, extras:[{item,amount,note}]} "
         + "or {type:'dish', label, ingredients:[{item,amount,note}]}), "
         + "steps (string array), "
-        + "original ({ingredients:[{item,amount,note}], steps:[string]}), "
-        + "image (empty string), notes (empty string). "
+        + "original ({ingredients:[{item,amount,note}], steps:[string]} — must match only the official ingredient list and instruction steps above), "
+        + "image (string: direct URL of the recipe's main hero/lead photo from the source page — the primary dish image shown with the recipe "
+        + "(e.g. og:image or featured image in the article body), as https or protocol-relative; not a gallery page or HTML URL; "
+        + "same domain as the recipe when possible; empty string only if there is no appropriate photo), "
+        + "notes (empty string). "
         + "Every ingredient must appear in exactly one group.";
 
       var resp = await fetch("https://yellow-block-9415.paulingford.workers.dev/", {
@@ -457,6 +479,7 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
       if (j0 === -1) throw new Error("No JSON in response: " + raw.slice(0, 200));
       var parsed = JSON.parse(raw.slice(j0, j1 + 1));
       if (!parsed.sourceUrl) parsed.sourceUrl = url.trim();
+      parsed.image = resolveRecipeImageUrl(parsed.image || "", parsed.sourceUrl || url.trim());
       setResult(parsed);
     } catch (err) {
       setError(err.message ? err.message.slice(0, 200) : "Unknown error");
@@ -552,7 +575,7 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
                     headers:{"Content-Type":"application/json"},
                     body:JSON.stringify({messages:[{role:"user",content:[
                       {type:"image",source:{type:"base64",media_type:mediaType,data:base64}},
-                      {type:"text",text:"Extract the recipe from this image. Return ONLY a JSON object with these fields: title (string), cuisine (string), cookTime (number in minutes), servings (number), ingredients (array of {item,amount,note}), steps (array of strings). No markdown, no explanation."}
+                      {type:"text",text:"Extract the recipe from this image. Use ONLY the printed ingredient list and instruction steps for the recipe itself. Ignore headnotes, intro paragraphs, chef's letter-style commentary, tips outside those two blocks, margins, and scribbles. Return ONLY a JSON object with these fields: title (string), cuisine (string), cookTime (number in minutes), servings (number), ingredients (array of {item,amount,note}), steps (array of strings). No markdown, no explanation."}
                     ]}]})
                   });
                   const data = await resp.json();
