@@ -51,6 +51,22 @@ const resolveRecipeImageUrl = (image, pageUrl) => {
   }
 };
 
+/** Stable key for matching a saved dish's sourceUrl to the bundled catalog. */
+const normalizeRecipePageKey = (url) => {
+  if (!url || typeof url !== "string") return "";
+  try {
+    const u = new URL(url.trim());
+    u.search = "";
+    u.hash = "";
+    const host = u.hostname.replace(/^www\./, "").toLowerCase();
+    let path = u.pathname || "/";
+    if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
+    return `${host}${path}`;
+  } catch {
+    return "";
+  }
+};
+
 // ─── Dish model
 // groups: array of group objects, each one of:
 //   {type:"component", componentId, label, extras:[], note}   — references canonical component
@@ -335,11 +351,11 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
 
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,51,160,0.25)",zIndex:300,display:"flex",alignItems:"flex-end",justifyContent:"center"}} onClick={onClose}>
-      <div onClick={e=>e.stopPropagation()} style={{background:T.surface,width:"100%",maxWidth:680,borderRadius:"14px 14px 0 0",maxHeight:"92vh",display:"flex",flexDirection:"column",paddingBottom:"env(safe-area-inset-bottom,0px)",animation:"slideUp 0.35s cubic-bezier(0.32,0.72,0,1)"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:T.surface,width:"100%",maxWidth:"none",borderRadius:"14px 14px 0 0",maxHeight:"92vh",display:"flex",flexDirection:"column",padding:"0 24px env(safe-area-inset-bottom, 0px)",boxSizing:"border-box",animation:"slideUp 0.35s cubic-bezier(0.32,0.72,0,1)"}}>
             <style>{`@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
         <style>{`@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
         {/* Header */}
-        <div style={{padding:"12px 16px 12px 0",flexShrink:0}}>
+        <div style={{padding:"12px 0",flexShrink:0}}>
           <div style={{width:36,height:4,borderRadius:100,background:T.border,margin:"0 auto 14px"}}/>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -350,10 +366,10 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
           </div>
         </div>
 
-        <div style={{overflowY:"auto",padding:"0 24px 0 0",flex:1}}>
+        <div style={{overflowY:"auto",padding:0,flex:1}}>
           {/* Photo loading overlay */}
           {mode==="photo"&&photoLoading&&(
-            <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"60px 16px 60px 0",gap:16}}>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"60px 0",gap:16}}>
               <div style={{width:40,height:40,borderRadius:"50%",border:`3px solid ${T.border}`,borderTopColor:T.text,animation:"spin 0.8s linear infinite"}}/>
               <div style={{fontSize:14,color:T.muted,fontFamily:T.font}}>Reading recipe…</div>
               <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
@@ -363,21 +379,21 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
           {/* Mode picker */}
           {mode===null&&(
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              <button onClick={()=>setMode("url")} style={{display:"flex",alignItems:"center",gap:16,padding:"16px 24px 16px 0",border:`1px solid ${T.border}`,borderRadius:100,background:"#fff",cursor:"pointer",textAlign:"left"}}>
+              <button onClick={()=>setMode("url")} style={{display:"flex",alignItems:"center",gap:16,padding:"16px 0",border:`1px solid ${T.border}`,borderRadius:100,background:"#fff",cursor:"pointer",textAlign:"left"}}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.muted} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                 <div>
                   <div style={{fontSize:14,fontWeight:600,color:T.text,fontFamily:T.font}}>Import from URL</div>
                   <div style={{fontSize:12,color:T.muted,fontFamily:T.font,marginTop:2}}>Adapted to use shared bases</div>
                 </div>
               </button>
-              <button onClick={()=>setMode("manual")} style={{display:"flex",alignItems:"center",gap:16,padding:"16px 24px 16px 0",border:`1px solid ${T.border}`,borderRadius:100,background:"#fff",cursor:"pointer",textAlign:"left"}}>
+              <button onClick={()=>setMode("manual")} style={{display:"flex",alignItems:"center",gap:16,padding:"16px 0",border:`1px solid ${T.border}`,borderRadius:100,background:"#fff",cursor:"pointer",textAlign:"left"}}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.muted} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
                 <div>
                   <div style={{fontSize:14,fontWeight:600,color:T.text,fontFamily:T.font}}>Write manually</div>
                   <div style={{fontSize:12,color:T.muted,fontFamily:T.font,marginTop:2}}>Type in your own recipe</div>
                 </div>
               </button>
-              <button onClick={()=>fileInputRef.current&&fileInputRef.current.click()} style={{display:"flex",alignItems:"center",gap:16,padding:"16px 24px 16px 0",border:`1px solid ${T.border}`,borderRadius:100,background:"#fff",cursor:"pointer",textAlign:"left"}}>
+              <button onClick={()=>fileInputRef.current&&fileInputRef.current.click()} style={{display:"flex",alignItems:"center",gap:16,padding:"16px 0",border:`1px solid ${T.border}`,borderRadius:100,background:"#fff",cursor:"pointer",textAlign:"left"}}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.muted} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 <div>
                   <div style={{fontSize:14,fontWeight:600,color:T.text,fontFamily:T.font}}>Scan a recipe</div>
@@ -522,48 +538,44 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
 };
 
 // ─── Dish Row ─────────────────────────────────────────────────────────────────
-const DishRow = ({dish, inWeek, onToggleWeek, onClick}) => (
-  <div style={{display:"flex",gap:16,alignItems:"center",padding:"16px 16px 16px 0",borderBottom:`1px solid ${T.border}`}}>
-    {(()=>{
-      const PHOTOS = {};
-      const photoId = PHOTOS[dish.id];
-      const imgSrc = dish.image || (photoId ? `https://images.unsplash.com/${photoId}?w=160&h=160&fit=crop&crop=center&auto=format` : null);
-      return (
-        <div onClick={onClick} style={{width:80,height:80,borderRadius:8,flexShrink:0,cursor:"pointer",overflow:"hidden",position:"relative"}}>
-          {(()=>{
-            // Tomine palette: flat graphic novel tones — dusty rose, slate blue, pale yellow, sage, terracotta, lavender, bone, teal, denim, rust
-            const PALETTE = ["#E8B4A0","#C97B6A","#8C4A40","#A8C0CC","#6A8FA0","#3A5F70","#D8D4B0","#B0A870","#7A7048","#B8C4A8","#7A9870","#445840","#D4C4C0","#A88890","#6A5060","#E0D4B8","#C0A868","#805830","#B4C8C8","#5A8888"];
-            // Deterministic index from dish id
-            const h = (dish.id||"x").split("").reduce((a,c)=>((a<<5)-a)+c.charCodeAt(0),0);
-            const c1 = PALETTE[Math.abs(h)%20];
-            const c2 = PALETTE[Math.abs(h*3+7)%20];
-            const c3 = PALETTE[Math.abs(h*7+13)%20];
-            const p1x = Math.abs(h*11)%80, p1y = Math.abs(h*17)%80;
-            const p2x = Math.abs(h*13)%80, p2y = Math.abs(h*19)%80;
-            const p3x = Math.abs(h*23)%80, p3y = Math.abs(h*29)%80;
-            return (
-              <>
-                <div style={{position:"absolute",inset:0,background:c3}}/>
-                <div style={{position:"absolute",width:70,height:70,borderRadius:"50%",background:c1,filter:"blur(18px)",top:p1y-20,left:p1x-20,opacity:0.85}}/>
-                <div style={{position:"absolute",width:60,height:60,borderRadius:"50%",background:c2,filter:"blur(14px)",top:p2y-10,left:p2x-10,opacity:0.75}}/>
-                <div style={{position:"absolute",width:50,height:50,borderRadius:"50%",background:c3,filter:"blur(12px)",top:p3y-5,left:p3x-5,opacity:0.65}}/>
-                {imgSrc&&<img src={imgSrc} alt={dish.title} style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}} onError={e=>{e.currentTarget.style.display="none";}}/>}
-              </>
-            );
-          })()}
+const DishRow = ({dish, inWeek, onToggleWeek, onClick}) => {
+  const PHOTOS = {};
+  const photoId = PHOTOS[dish.id];
+  const imgSrc =
+    dish.image ||
+    (photoId ? `https://images.unsplash.com/${photoId}?w=640&h=426&fit=crop&crop=center&auto=format` : null);
+  const PALETTE = ["#E8B4A0","#C97B6A","#8C4A40","#A8C0CC","#6A8FA0","#3A5F70","#D8D4B0","#B0A870","#7A7048","#B8C4A8","#7A9870","#445840","#D4C4C0","#A88890","#6A5060","#E0D4B8","#C0A868","#805830","#B4C8C8","#5A8888"];
+  const h = (dish.id||"x").split("").reduce((a,c)=>((a<<5)-a)+c.charCodeAt(0),0);
+  const c1 = PALETTE[Math.abs(h)%20];
+  const c2 = PALETTE[Math.abs(h*3+7)%20];
+  const c3 = PALETTE[Math.abs(h*7+13)%20];
+  const p1x = Math.abs(h*11)%80, p1y = Math.abs(h*17)%80;
+  const p2x = Math.abs(h*13)%80, p2y = Math.abs(h*19)%80;
+  const p3x = Math.abs(h*23)%80, p3y = Math.abs(h*29)%80;
+  return (
+    <div className="mise-dish-row">
+      <div className="mise-dish-media" onClick={onClick} role="presentation">
+        <div className="mise-dish-media-bg" style={{position:"absolute",inset:0,background:c3}}/>
+        <div className="mise-dish-blob mise-dish-blob-a" style={{position:"absolute",width:70,height:70,borderRadius:"50%",background:c1,filter:"blur(18px)",top:p1y-20,left:p1x-20,opacity:0.85}}/>
+        <div className="mise-dish-blob mise-dish-blob-b" style={{position:"absolute",width:60,height:60,borderRadius:"50%",background:c2,filter:"blur(14px)",top:p2y-10,left:p2x-10,opacity:0.75}}/>
+        <div className="mise-dish-blob mise-dish-blob-c" style={{position:"absolute",width:50,height:50,borderRadius:"50%",background:c3,filter:"blur(12px)",top:p3y-5,left:p3x-5,opacity:0.65}}/>
+        {imgSrc&&(
+          <img src={imgSrc} alt="" decoding="async" referrerPolicy="no-referrer" className="mise-dish-img" onError={e=>{e.currentTarget.style.display="none";}}/>
+        )}
+      </div>
+      <div className="mise-dish-footer">
+        <div className="mise-dish-text" onClick={onClick} role="presentation">
+          <div className="mise-dish-title">{dish.title}</div>
+          {dish.sourceUrl&&<div className="mise-dish-source">{sourceName(dish.sourceUrl)}</div>}
+          <div className="mise-dish-meta"><ClockIcon/>{dish.cookTime} min</div>
         </div>
-      );
-    })()}
-    <div onClick={onClick} style={{flex:1,minWidth:0,cursor:"pointer"}}>
-      <div style={{fontSize:14,fontWeight:600,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",fontFamily:T.font}}>{dish.title}</div>
-      {dish.sourceUrl&&<div style={{fontSize:12,color:T.muted,marginTop:0,fontFamily:T.font}}>{sourceName(dish.sourceUrl)}</div>}
-      <div style={{fontSize:12,color:T.muted,marginTop:0,fontFamily:T.font,display:"flex",alignItems:"center",gap:8}}><ClockIcon/>{dish.cookTime} min</div>
+        <button type="button" className="mise-dish-cta" onClick={(e)=>{e.stopPropagation();onToggleWeek(dish.id);}} aria-label={inWeek?"Remove from this week":"Add to this week"} style={{border:`1.5px solid ${T.text}`,borderRadius:"50%",width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,padding:0,transition:"all 0.2s ease",color:inWeek?"#fff":T.text,background:inWeek?T.text:"transparent"}}>
+          {inWeek?<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>}
+        </button>
+      </div>
     </div>
-    <button onClick={()=>onToggleWeek(dish.id)} style={{border:`1.5px solid ${T.text}`,borderRadius:"50%",width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,padding:0,transition:"all 0.2s ease",color:inWeek?"#fff":T.text,background:inWeek?T.text:"transparent"}}>
-      {inWeek?<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>}
-    </button>
-  </div>
-);
+  );
+};
 
 // ─── Dish Detail ──────────────────────────────────────────────────────────────
 const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes, onShowOriginal, onShowToast, onTagSelect}) => {
@@ -581,74 +593,121 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
   );
   const hasOriginal = dish.original?.ingredients?.length > 0;
 
-  return (
-    <div style={{height:"100%",background:"#fff",fontFamily:T.font,overflowY:"auto",position:"relative"}} onScroll={e=>setScrollY(e.currentTarget.scrollTop)}>
+  const heroBlock = (() => {
+    const PHOTOS = {};
+    const photoId = PHOTOS[dish.id];
+    const heroSrc = dish.image || (photoId ? `https://images.unsplash.com/${photoId}?w=480&h=400&fit=crop&crop=center&auto=format` : null);
+    const PALETTE = ["#E8B4A0","#C97B6A","#8C4A40","#A8C0CC","#6A8FA0","#3A5F70","#D8D4B0","#B0A870","#7A7048","#B8C4A8","#7A9870","#445840","#D4C4C0","#A88890","#6A5060","#E0D4B8","#C0A868","#805830","#B4C8C8","#5A8888"];
+    const h = (dish.id||"x").split("").reduce((a,c)=>((a<<5)-a)+c.charCodeAt(0),0);
+    const c1 = PALETTE[Math.abs(h)%20];
+    const c2 = PALETTE[Math.abs(h*3+7)%20];
+    const c3 = PALETTE[Math.abs(h*7+13)%20];
+    const actionBtnStyle = {
+      width: 36,
+      height: 36,
+      borderRadius: "50%",
+      border: `1.5px solid ${T.text}`,
+      background: "rgba(255,255,255,0.92)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      padding: 0,
+      flexShrink: 0,
+      boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+    };
+    return (
+      <div className="mise-detail-hero-visual-inner" style={{position:"relative",aspectRatio:"3/2",overflow:"hidden",background:c3}}>
+        <div className="mise-detail-hero-parallax" style={{position:"absolute",inset:0,transform:`translateY(${scrollY*0.4}px)`,willChange:"transform"}}>
+          <div style={{position:"absolute",width:320,height:320,borderRadius:"50%",background:c1,filter:"blur(80px)",top:-80,left:-60,opacity:0.9}}/>
+          <div style={{position:"absolute",width:280,height:280,borderRadius:"50%",background:c2,filter:"blur(64px)",top:60,right:-60,opacity:0.8}}/>
+          <div style={{position:"absolute",width:240,height:240,borderRadius:"50%",background:c3,filter:"blur(56px)",bottom:-80,left:"20%",opacity:0.7}}/>
+          {heroSrc&&<img src={heroSrc} alt="" aria-label={dish.title} referrerPolicy="no-referrer" decoding="async" style={{position:"absolute",inset:0,zIndex:1,width:"100%",height:"100%",maxWidth:"none",objectFit:"cover",display:"block"}} onError={e=>{e.currentTarget.style.display="none";}}/>}
+        </div>
+        <div className="mise-detail-hero-toolbar" style={{position:"absolute",top:0,left:0,right:0,zIndex:3,display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"flex-end",gap:8,padding:16,pointerEvents:"none"}}>
+          <button
+            type="button"
+            onClick={()=>{if(!inWeek&&onShowToast)onShowToast(dish);onToggleWeek(dish.id);}}
+            className="mise-detail-hero-toolbar-week"
+            style={{
+              pointerEvents:"all",
+              background:inWeek?"rgba(0,51,160,0.92)":"rgba(255,255,255,0.92)",
+              color:inWeek?"#fff":T.text,
+              backdropFilter:"blur(12px)",
+              WebkitBackdropFilter:"blur(12px)",
+              border:"none",
+              borderRadius:100,
+              padding:"0 16px",
+              height:36,
+              cursor:"pointer",
+              fontSize:12,
+              fontFamily:T.font,
+              fontWeight:600,
+              boxShadow:"0 2px 8px rgba(0,0,0,0.12)",
+              transition:"all 0.2s ease",
+            }}
+          >
+            {inWeek?"✓ This week":"Cook this week"}
+          </button>
+          <button type="button" aria-label="Save recipe" style={{...actionBtnStyle,pointerEvents:"all"}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button type="button" aria-label="More options" style={{...actionBtnStyle,pointerEvents:"all"}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill={T.text} stroke="none"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+          </button>
+        </div>
+      </div>
+    );
+  })();
 
-      {/* Cook this week pill — top right */}
-      <div style={{position:"fixed",top:0,right:0,zIndex:120,pointerEvents:"none",padding:"16px 16px 0 0"}}>
+  return (
+    <div className="mise-detail-scroll" style={{height:"100%",background:"#fff",fontFamily:T.font,overflowY:"auto",position:"relative"}} onScroll={e=>setScrollY(e.currentTarget.scrollTop)}>
+
+      {/* Cook this week — fixed top-right on narrow viewports only */}
+      <div className="mise-detail-week-pill-wrap" style={{position:"fixed",top:0,right:0,zIndex:120,pointerEvents:"none",padding:"16px 16px 0 0"}}>
         <button onClick={()=>{if(!inWeek&&onShowToast)onShowToast(dish);onToggleWeek(dish.id);}} style={{pointerEvents:"all",background:inWeek?"rgba(0,51,160,0.9)":"rgba(255,255,255,0.85)",color:inWeek?"#fff":T.text,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:"none",borderRadius:100,padding:"0 16px",height:36,cursor:"pointer",fontSize:12,fontFamily:T.font,fontWeight:600,boxShadow:"0 2px 8px rgba(0,0,0,0.12)",transition:"all 0.2s ease"}}>
           {inWeek?"✓ This week":"Cook this week"}
         </button>
       </div>
 
-      {/* Hero photo — touches top, floats header over it */}
-      {(()=>{
-        const PHOTOS = {};
-        const photoId = PHOTOS[dish.id];
-        const heroSrc = dish.image || (photoId ? `https://images.unsplash.com/${photoId}?w=480&h=400&fit=crop&crop=center&auto=format` : null);
-        const PALETTE = ["#E8B4A0","#C97B6A","#8C4A40","#A8C0CC","#6A8FA0","#3A5F70","#D8D4B0","#B0A870","#7A7048","#B8C4A8","#7A9870","#445840","#D4C4C0","#A88890","#6A5060","#E0D4B8","#C0A868","#805830","#B4C8C8","#5A8888"];
-        const h = (dish.id||"x").split("").reduce((a,c)=>((a<<5)-a)+c.charCodeAt(0),0);
-        const c1 = PALETTE[Math.abs(h)%20];
-        const c2 = PALETTE[Math.abs(h*3+7)%20];
-        const c3 = PALETTE[Math.abs(h*7+13)%20];
-        return (
-          <div style={{position:"relative",aspectRatio:"3/2",overflow:"hidden",background:c3}}>
-            <div style={{position:"absolute",inset:0,transform:`translateY(${scrollY*0.4}px)`,willChange:"transform"}}>
-              <div style={{position:"absolute",width:320,height:320,borderRadius:"50%",background:c1,filter:"blur(80px)",top:-80,left:-60,opacity:0.9}}/>
-              <div style={{position:"absolute",width:280,height:280,borderRadius:"50%",background:c2,filter:"blur(64px)",top:60,right:-60,opacity:0.8}}/>
-              <div style={{position:"absolute",width:240,height:240,borderRadius:"50%",background:c3,filter:"blur(56px)",bottom:-80,left:"20%",opacity:0.7}}/>
-              {heroSrc&&<img src={heroSrc} alt="" aria-label={dish.title} style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}} onError={e=>{e.currentTarget.style.display="none";}}/>}
+      <div className="mise-detail-hero">
+        <div className="mise-detail-hero-visual">
+          {heroBlock}
+        </div>
+        <div className="mise-detail-hero-copy" style={{padding:"16px 16px 16px 0",boxSizing:"border-box"}}>
+          <div style={{fontSize:11,letterSpacing:"0.08em",textTransform:"uppercase",color:T.text,fontFamily:T.font,marginBottom:6,fontWeight:400}}>
+            {dish.original?.ingredients?.length>0?"Adapted recipe":"Original recipe"}
+          </div>
+          <div className="mise-detail-title-row" style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12,marginBottom:8}}>
+            <div className="mise-detail-title" style={{fontSize:32,fontWeight:600,color:T.text,lineHeight:1.15,letterSpacing:"-0.01em",fontFamily:T.fontTitle,flex:1,minWidth:0}}>{dish.title}</div>
+            <div className="mise-detail-title-side-actions" style={{display:"flex",gap:8,flexShrink:0,paddingTop:0}}>
+              <button type="button" aria-label="Save recipe" style={{width:36,height:36,borderRadius:"50%",border:`1.5px solid ${T.text}`,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",padding:0,flexShrink:0}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <button type="button" aria-label="More options" style={{width:36,height:36,borderRadius:"50%",border:`1.5px solid ${T.text}`,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",padding:0,flexShrink:0}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill={T.text} stroke="none"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+              </button>
             </div>
           </div>
-        );
-      })()}
-
-      {/* Meta */}
-      <div style={{padding:"16px 16px 16px 0"}}>
-        {/* Recipe type label */}
-        <div style={{fontSize:11,letterSpacing:"0.08em",textTransform:"uppercase",color:T.text,fontFamily:T.font,marginBottom:6,fontWeight:400}}>
-          {dish.original?.ingredients?.length>0?"Adapted recipe":"Original recipe"}
-        </div>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12,marginBottom:8}}>
-          <div style={{fontSize:32,fontWeight:600,color:T.text,lineHeight:1.15,letterSpacing:"-0.01em",fontFamily:T.fontTitle,flex:1}}>{dish.title}</div>
-          <div style={{display:"flex",gap:8,flexShrink:0,paddingTop:0}}>
-            <button style={{width:36,height:36,borderRadius:"50%",border:`1.5px solid ${T.text}`,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",padding:0,flexShrink:0}}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            </button>
-            <button style={{width:36,height:36,borderRadius:"50%",border:`1.5px solid ${T.text}`,background:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",padding:0,flexShrink:0}}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill={T.text} stroke="none"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-            </button>
+          <div style={{fontSize:12,color:T.muted,display:"flex",flexWrap:"wrap",gap:16,marginBottom:8}}>
+            <span>{dish.cuisine}</span>
+            <span style={{display:"flex",alignItems:"center",gap:4}}><ClockIcon/>{dish.cookTime} min</span>
+            <span>{dish.servings} servings</span>
           </div>
-        </div>
-        <div style={{fontSize:12,color:T.muted,display:"flex",gap:16,marginBottom:8}}>
-          <span>{dish.cuisine}</span>
-          <span style={{display:"flex",alignItems:"center",gap:4}}><ClockIcon/>{dish.cookTime} min</span>
-          <span>{dish.servings} servings</span>
-        </div>
-        {dish.sourceUrl&&(
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-            {/* Source logo placeholder circle */}
-            <div style={{width:24,height:24,borderRadius:"50%",background:T.border,flexShrink:0,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <span style={{fontSize:11,color:T.muted,fontFamily:T.font,fontWeight:600,letterSpacing:"0.02em"}}>
-                {sourceName(dish.sourceUrl)?.slice(0,2).toUpperCase()}
-              </span>
+          {dish.sourceUrl&&(
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+              <div style={{width:24,height:24,borderRadius:"50%",background:T.border,flexShrink:0,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <span style={{fontSize:11,color:T.muted,fontFamily:T.font,fontWeight:600,letterSpacing:"0.02em"}}>
+                  {sourceName(dish.sourceUrl)?.slice(0,2).toUpperCase()}
+                </span>
+              </div>
+              <span style={{fontSize:12,color:T.muted,fontFamily:T.font}}>{sourceName(dish.sourceUrl)||dish.sourceTitle}</span>
             </div>
-            <span style={{fontSize:12,color:T.muted,fontFamily:T.font}}>{sourceName(dish.sourceUrl)||dish.sourceTitle}</span>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       {/* Tab bar — matching week page style */}
-      <div style={{position:"sticky",top:0,zIndex:10,background:"#fff",borderBottom:`1px solid ${T.border}`,padding:"0 16px 0 0",display:"flex",gap:8}}>
+      <div className="mise-detail-tabbar" style={{position:"sticky",top:0,zIndex:10,background:"#fff",borderBottom:`1px solid ${T.border}`,padding:"0 16px 0 0",display:"flex",gap:8}}>
         {[{id:"ingredients",label:"Ingredients"},{id:"instructions",label:"Instructions"}].map(t=>(
           <button key={t.id} onClick={()=>setView(t.id)} style={{flex:1,padding:"14px 0",background:"none",border:"none",borderBottom:`2px solid ${view===t.id?T.accent:"transparent"}`,color:view===t.id?T.accent:T.muted,fontSize:12,fontFamily:T.font,fontWeight:view===t.id?600:400,cursor:"pointer",transition:"color 0.2s ease",textAlign:"left"}}>{t.label}</button>
         ))}
@@ -656,7 +715,7 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
 
       {/* ── Ingredients view ── */}
       {view==="ingredients"&&(
-        <div style={{padding:"24px 16px 24px 0"}}>
+        <div className="mise-detail-ingredients" style={{padding:"24px 16px 24px 0"}}>
           {(dish.groups||[]).map((group,gi)=>{
             const gk="g"+gi;
             const gChecked=!!checked[gk];
@@ -727,7 +786,7 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
 
       {/* ── Instructions view ── */}
       {view==="instructions"&&(
-        <div style={{padding:"24px 16px 24px 0"}}>
+        <div className="mise-detail-instructions" style={{padding:"24px 16px 24px 0"}}>
           {/* Base instructions — shown for cooks who want to cook inline */}
           {(dish.groups||[]).filter(g=>g.type==="component"&&COMPONENT_LIBRARY[g.componentId]?.instructions?.length).map((g,gi)=>{
             const comp = COMPONENT_LIBRARY[g.componentId];
@@ -759,7 +818,7 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
       {/* ── Original view ── */}
 
       {/* Notes */}
-      <div style={{padding:"28px 16px 80px 0"}}>
+      <div className="mise-detail-notes" style={{padding:"28px 16px 80px 0"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
           <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.muted,fontWeight:600}}>Notes</div>
           <div style={{display:"flex",gap:8}}>
@@ -857,6 +916,7 @@ const RecipesTab = ({weekDishIds, onToggleWeek, onViewDish, dishes, initialTag, 
     });
 
   const sortLabel = SORT_OPTIONS.find(o=>o.id===sort)?.label||"Sort";
+  const filtersOpen = searchFocused || Boolean(search?.trim()) || Boolean(activeTag);
 
   const onScroll = (e) => {
     if(inputRef.current) inputRef.current.blur();
@@ -868,9 +928,9 @@ const RecipesTab = ({weekDishIds, onToggleWeek, onViewDish, dishes, initialTag, 
   };
 
   return (
-    <div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column"}} onScroll={onScroll} onClick={(e)=>{if(e.target!==inputRef.current&&inputRef.current)inputRef.current.blur();}}>
+    <div className="mise-recipes-tab" style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column"}} onScroll={onScroll} onClick={(e)=>{if(e.target!==inputRef.current&&inputRef.current)inputRef.current.blur();}}>
       {/* Sticky search + sort button */}
-      <div style={{position:"sticky",top:0,zIndex:10,background:T.surface,borderBottom:`1px solid ${T.border}`,transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)",transform:shown?"translateY(0)":"translateY(-110%)",padding:"12px 16px 12px 0"}}>
+      <div className="mise-recipes-sticky" style={{position:"sticky",top:0,zIndex:10,background:T.surface,transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)",transform:shown?"translateY(0)":"translateY(-110%)",padding:"12px 16px 12px 0"}}>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <div style={{position:"relative",flex:1}}>
             <svg style={{position:"absolute",left:11,top:"50%",transform:"translateY(-50%)",color:T.text}} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -886,31 +946,26 @@ const RecipesTab = ({weekDishIds, onToggleWeek, onViewDish, dishes, initialTag, 
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
         </div>
-        {/* Tag chips — inside sticky header, two wrapping rows */}
-        {(searchFocused||search||activeTag)&&(
-          <div style={{
-            display:"flex",flexWrap:"wrap",gap:6,
-            padding:"8px 16px 8px 0",
-            maxHeight:"80px",overflow:"hidden",
-          }}>
-            {TAGS.map(t=>(
-              <TagChip key={t.label} label={t.label} active={activeTag===t.label} onClick={()=>{setActiveTag(activeTag===t.label?null:t.label);}}/>
-            ))}
-          </div>
-        )}
+        {/* Tag chips — animated reveal when search is focused or filters active */}
+        <div className={`mise-recipes-filters ${filtersOpen ? "mise-recipes-filters--open" : ""}`}>
+          {TAGS.map(t=>(
+            <TagChip key={t.label} label={t.label} active={activeTag===t.label} onClick={()=>{setActiveTag(activeTag===t.label?null:t.label);}}/>
+          ))}
+        </div>
       </div>
-      <div style={{padding:"4px 16px 8px 0",fontSize:12,color:T.muted}}>{filtered.length} dish{filtered.length!==1?"es":""}</div>
-      {filtered.map(d=><DishRow key={d.id} dish={d} inWeek={weekDishIds.includes(d.id)} onToggleWeek={onToggleWeek} onClick={()=>onViewDish(d)}/>)}
+      <div className="mise-recipe-grid">
+        {filtered.map(d=><DishRow key={d.id} dish={d} inWeek={weekDishIds.includes(d.id)} onToggleWeek={onToggleWeek} onClick={()=>onViewDish(d)}/>)}
+      </div>
       <div style={{height:140}}/>
 
       {/* Sort sheet */}
       {sortOpen&&(
         <div style={{position:"fixed",inset:0,background:"rgba(0,51,160,0.25)",zIndex:300,display:"flex",alignItems:"flex-end",justifyContent:"center"}} onClick={()=>setSortOpen(false)}>
-          <div onClick={e=>e.stopPropagation()} style={{background:T.surface,width:"100%",maxWidth:680,borderRadius:"16px 16px 0 0",paddingBottom:"env(safe-area-inset-bottom,0px)",animation:"slideUp 0.35s cubic-bezier(0.32,0.72,0,1)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:T.surface,width:"100%",maxWidth:"none",borderRadius:"16px 16px 0 0",padding:"0 24px env(safe-area-inset-bottom, 0px)",boxSizing:"border-box",animation:"slideUp 0.35s cubic-bezier(0.32,0.72,0,1)"}}>
             <div style={{width:36,height:4,borderRadius:100,background:T.border,margin:"12px auto 8px"}}/>
-            <div style={{padding:"8px 24px 4px 0",fontSize:11,letterSpacing:"0.08em",textTransform:"uppercase",color:T.muted,fontWeight:600}}>Sort by</div>
+            <div style={{padding:"8px 0 4px",fontSize:11,letterSpacing:"0.08em",textTransform:"uppercase",color:T.muted,fontWeight:600}}>Sort by</div>
             {SORT_OPTIONS.map(o=>(
-              <button key={o.id} onClick={()=>{setSort(o.id);setSortOpen(false);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",padding:"16px 24px 16px 0",background:"none",border:"none",borderTop:`1px solid ${T.border}`,cursor:"pointer",fontFamily:T.font,fontSize:14,color:T.text,textAlign:"left"}}>
+              <button key={o.id} onClick={()=>{setSort(o.id);setSortOpen(false);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",padding:"16px 0",background:"none",border:"none",borderTop:`1px solid ${T.border}`,cursor:"pointer",fontFamily:T.font,fontSize:14,color:T.text,textAlign:"left"}}>
                 {o.label}
                 {sort===o.id&&<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
               </button>
@@ -1068,18 +1123,18 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
   const recGroups = buildGroups();
 
   return (
-    <div ref={scrollRef} style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",background:"#fff"}}>
-      <div style={{position:"sticky",top:0,zIndex:10,background:"#fff",borderBottom:`1px solid ${T.border}`,padding:"0 16px 0 0",display:"flex",flexShrink:0,gap:8}}>
+    <div ref={scrollRef} className="mise-week-tab" style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",background:"#fff"}}>
+      <div className="mise-week-subtabs" style={{position:"sticky",top:0,zIndex:10,background:"#fff",borderBottom:`1px solid ${T.border}`,padding:"0 16px 0 0",display:"flex",flexShrink:0,gap:8}}>
         {[{id:"dishes",label:"Recipes"},{id:"prep",label:"Mise en place"},{id:"shopping",label:"Shopping list"}].map(t=>(
           <button key={t.id} onClick={()=>{setSubTab(t.id);if(scrollRef.current)scrollRef.current.scrollTop=0;}} style={{flex:1,padding:"14px 0",background:"none",border:"none",borderBottom:`2px solid ${subTab===t.id?T.accent:"transparent"}`,color:subTab===t.id?T.accent:T.muted,fontSize:12,fontFamily:T.font,fontWeight:subTab===t.id?600:400,cursor:"pointer",transition:"color 0.2s ease",textAlign:"left"}}>{t.label}</button>
         ))}
       </div>
 
       {subTab==="dishes"&&(
-        <div>
+        <div className="mise-week-dishes-sub">
           {/* Banner — shown when no recipes selected */}
           {weekDishes.length===0&&(
-            <div style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${T.border}`,minHeight:180,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <div className="mise-week-banner" style={{position:"relative",overflow:"hidden",borderBottom:`1px solid ${T.border}`,minHeight:180,display:"flex",alignItems:"center",justifyContent:"center"}}>
               <style>{`
                 @keyframes blob1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.1)}66%{transform:translate(-20px,15px) scale(0.95)}}
                 @keyframes blob2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-25px,20px) scale(1.05)}66%{transform:translate(20px,-10px) scale(1.1)}}
@@ -1090,8 +1145,7 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
               <div style={{position:"absolute",width:200,height:200,borderRadius:"50%",background:"rgba(255,100,80,0.4)",filter:"blur(48px)",top:20,right:-30,animation:"blob2 9s ease-in-out infinite"}}/>
               <div style={{position:"absolute",width:180,height:180,borderRadius:"50%",background:"rgba(255,160,200,0.5)",filter:"blur(40px)",bottom:-40,left:"30%",animation:"blob3 8s ease-in-out infinite"}}/>
               <div style={{position:"relative",zIndex:2,textAlign:"left",padding:"40px 16px 40px 0"}}>
-                <div style={{fontSize:20,fontWeight:600,color:"rgba(60,30,10,0.75)",lineHeight:1.4,fontFamily:T.font}}>Less time cooking.</div>
-                <div style={{fontSize:20,fontWeight:600,color:"rgba(60,30,10,0.75)",lineHeight:1.4,fontFamily:T.font}}>More time eating well.</div>
+                <div style={{fontSize:20,fontWeight:600,color:"rgba(60,30,10,0.75)",lineHeight:1.4,fontFamily:T.font}}>Pick a recipe to get started.</div>
               </div>
             </div>
           )}
@@ -1100,7 +1154,7 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
           {/* Suggestions */}
           {weekDishes.length>0&&suggestions.length>0&&(
             <div>
-              <div style={{padding:"16px 16px 8px 0",borderTop:`1px solid ${T.border}`}}>
+              <div className="mise-week-hr-top" style={{padding:"16px 16px 8px 0",borderTop:`1px solid ${T.border}`}}>
                 <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.text,fontWeight:600,fontFamily:T.font}}>Shared bases and ingredients</div>
               </div>
               {suggestions.map(({d})=>(
@@ -1109,19 +1163,21 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
             </div>
           )}
           {/* Suggested recipe groups — always shown */}
-          <div style={{borderTop:`1px solid ${T.border}`,padding:"16px 16px 8px 0"}}>
+          <div className="mise-week-hr-top" style={{borderTop:`1px solid ${T.border}`,padding:"16px 16px 8px 0"}}>
             <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.text,fontWeight:600,fontFamily:T.font}}>Suggested recipes for the week</div>
           </div>
           {recGroups.map((group,gi)=>(
             <div key={gi}>
-              <div style={{padding:"16px 16px 8px 0",display:"flex",alignItems:"center",justifyContent:"space-between",borderTop:`1px solid ${T.border}`}}>
-                <div style={{fontSize:20,fontWeight:600,color:T.text,fontFamily:T.fontTitle}}>{group.theme}</div>
-                <button onClick={()=>{
+              <div className="mise-week-group-header mise-week-hr-top" style={{padding:"16px 16px 8px 0",display:"flex",alignItems:"center",gap:12,borderTop:`1px solid ${T.border}`}}>
+                <div style={{fontSize:20,fontWeight:600,color:T.text,fontFamily:T.fontTitle,flex:1,minWidth:0}}>{group.theme}</div>
+                <button type="button" className="mise-week-add-all-btn" onClick={()=>{
                   setWeekDishIds(ids=>[...new Set([...ids,...group.dishes.map(d=>d.id)])]);
                   if(scrollRef.current) scrollRef.current.scrollTop=0;
                 }} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:100,padding:"0 12px",height:36,fontSize:12,fontFamily:T.font,color:T.text,cursor:"pointer",fontWeight:400,flexShrink:0}}>Add all 3</button>
               </div>
-              {group.dishes.map(d=><DishRow key={d.id} dish={d} inWeek={weekDishIds.includes(d.id)} onToggleWeek={id=>setWeekDishIds(ids=>ids.includes(id)?ids.filter(i=>i!==id):[...ids,id])} onClick={()=>onViewDish(d)}/>)}
+              <div className="mise-week-rec-group-dishes">
+                {group.dishes.map(d=><DishRow key={d.id} dish={d} inWeek={weekDishIds.includes(d.id)} onToggleWeek={id=>setWeekDishIds(ids=>ids.includes(id)?ids.filter(i=>i!==id):[...ids,id])} onClick={()=>onViewDish(d)}/>)}
+              </div>
             </div>
           ))}
           <div style={{height:140}}/>
@@ -1239,7 +1295,7 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
 
 // ─── Profile Tab ──────────────────────────────────────────────────────────────
 const ProfileTab = ({dishes}) => (
-  <div style={{flex:1,overflowY:"auto"}}>
+  <div className="mise-profile-tab" style={{flex:1,overflowY:"auto"}}>
     <div style={{borderBottom:`1px solid ${T.border}`,padding:"28px 16px 28px 0"}}>
       <div style={{width:48,height:48,borderRadius:"50%",background:T.border,marginBottom:10,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:16,color:T.muted}}>P</span></div>
       <div style={{fontSize:20,fontWeight:600,color:T.text,fontFamily:T.font}}>Paul</div>
@@ -1267,6 +1323,32 @@ const ProfileTab = ({dishes}) => (
 );
 
 const MISE_STORAGE_KEY = "mise-app-state";
+
+const CATALOG_BY_ID = Object.fromEntries(INITIAL_DISHES.map((d) => [d.id, d]));
+const CATALOG_BY_SOURCE = (() => {
+  const m = {};
+  for (const d of INITIAL_DISHES) {
+    const k = normalizeRecipePageKey(d.sourceUrl || "");
+    if (k) m[k] = d;
+  }
+  return m;
+})();
+
+/**
+ * Point catalog dishes at bundled hero URLs. Always prefer the catalog image (by id or sourceUrl)
+ * so stale/broken URLs in localStorage or imports don’t hide the photo.
+ */
+const enrichDishesFromCatalog = (dishes) =>
+  dishes.map((d) => {
+    let canon = CATALOG_BY_ID[d.id];
+    if (!canon && d.sourceUrl) {
+      const key = normalizeRecipePageKey(d.sourceUrl);
+      if (key) canon = CATALOG_BY_SOURCE[key];
+    }
+    if (!canon?.image) return d;
+    return { ...d, image: canon.image };
+  });
+
 const loadPersistedState = () => {
   try {
     if (typeof localStorage === "undefined") return null;
@@ -1285,7 +1367,9 @@ const loadPersistedState = () => {
 
 const __miseHydrated = (() => {
   const p = loadPersistedState();
-  return p ? { dishes: p.dishes, weekDishIds: p.weekDishIds } : { dishes: INITIAL_DISHES, weekDishIds: [] };
+  return p
+    ? { dishes: enrichDishesFromCatalog(p.dishes), weekDishIds: p.weekDishIds }
+    : { dishes: INITIAL_DISHES, weekDishIds: [] };
 })();
 
 // ─── App ──────────────────────────────────────────────────────────────────────
@@ -1300,6 +1384,10 @@ export default function App() {
   const [importOpen, setImportOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
+
+  useEffect(() => {
+    setDishes((prev) => enrichDishesFromCatalog(prev));
+  }, []);
 
   const showToast = (dish) => {
     if(toastTimer.current) clearTimeout(toastTimer.current);
@@ -1341,32 +1429,339 @@ export default function App() {
   }, [dishes, weekDishIds]);
 
   return (
-    <div style={{display:"flex",flexDirection:"column",height:"100vh",background:"#fff",fontFamily:T.font,width:"100%",maxWidth:680,margin:"0 auto",position:"relative",overflow:"hidden",boxShadow:"0 0 0 1px rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.08)"}}>
+    <div className="mise-app-shell" style={{display:"flex",flexDirection:"column",height:"100vh",background:"#fff",fontFamily:T.font,width:"100%",position:"relative",overflow:"hidden"}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
         html { font-size: clamp(14px, 1.6vw, 16px); font-family: 'Poppins', sans-serif; }
-        body { background: #F5F4F0; margin: 0; }
+        body { margin: 0; background: #fff; }
         input, textarea, button { font-family: inherit; font-size: 16px; }
         input::placeholder { font-size: 14px; opacity: 0.5; }
         img { max-width: 100%; }
         ::-webkit-scrollbar { display: none; }
         scrollbar-width: none;
+
+        .mise-app-shell {
+          max-width: none;
+          margin: 0;
+          width: 100%;
+          box-shadow: none;
+        }
+        .mise-app-header {
+          width: 100%;
+          box-sizing: border-box;
+        }
+        .mise-app-main {
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .mise-recipes-filters {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          max-height: 0;
+          opacity: 0;
+          overflow: hidden;
+          padding: 0 16px 0 0;
+          box-sizing: border-box;
+          pointer-events: none;
+          transition: max-height 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+            opacity 0.28s ease,
+            padding-top 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+            padding-bottom 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .mise-recipes-filters--open {
+          max-height: 200px;
+          opacity: 1;
+          padding-top: 8px;
+          padding-bottom: 8px;
+          pointer-events: auto;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .mise-recipes-filters {
+            transition: none;
+          }
+        }
+
+        .mise-dish-row {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 16px;
+          padding: 16px 16px 16px 0;
+          border-bottom: 1px solid #E8E8E4;
+        }
+        .mise-dish-media {
+          width: 80px;
+          height: 80px;
+          border-radius: 8px;
+          flex-shrink: 0;
+          cursor: pointer;
+          overflow: hidden;
+          position: relative;
+        }
+        .mise-dish-img {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          width: 100%;
+          height: 100%;
+          max-width: none;
+          object-fit: cover;
+          display: block;
+        }
+        .mise-dish-footer {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 16px;
+        }
+        .mise-dish-text { flex: 1; min-width: 0; cursor: pointer; }
+        .mise-dish-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #0033A0;
+          font-family: 'Poppins', sans-serif;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .mise-dish-source {
+          font-size: 12px;
+          color: rgba(0,51,160,0.5);
+          margin-top: 0;
+          font-family: 'Poppins', sans-serif;
+        }
+        .mise-dish-meta {
+          font-size: 12px;
+          color: rgba(0,51,160,0.5);
+          margin-top: 0;
+          font-family: 'Poppins', sans-serif;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .mise-app-header-rule {
+          position: absolute;
+          bottom: 0;
+          left: 80px;
+          right: 0;
+          height: 1px;
+          background: #E8E8E4;
+        }
+        .mise-detail-overlay,
+        .mise-original-overlay {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 80px;
+          right: 0;
+        }
+        .mise-detail-hero-toolbar {
+          display: none;
+        }
+        .mise-detail-title {
+          overflow-wrap: break-word;
+          word-break: break-word;
+        }
+        @media (min-width: 768px) {
+          .mise-detail-hero-copy .mise-detail-title {
+            overflow-wrap: anywhere;
+          }
+        }
+        .mise-detail-title-row,
+        .mise-detail-hero-copy {
+          min-width: 0;
+        }
+
+        @media (min-width: 768px) {
+          .mise-nav-rail {
+            border-right: 1px solid #E8E8E4;
+            background: #fff;
+          }
+          .mise-app-header {
+            width: 100%;
+            padding-left: calc(80px + 64px) !important;
+            padding-right:64px !important;
+            box-sizing: border-box;
+          }
+          .mise-app-header-rule {
+            left: calc(80px + 64px);
+            right: 64px;
+          }
+          .mise-app-main {
+            padding-left: calc(80px + 64px) !important;
+            padding-right: 64px !important;
+          }
+          .mise-recipes-sticky { padding: 12px 0 !important; }
+          .mise-recipes-filters,
+          .mise-recipes-filters--open {
+            padding-right: 0 !important;
+          }
+          .mise-recipe-grid {
+            display: grid;
+            gap: 16px;
+            padding: 0 0 24px 0;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            align-items: stretch;
+          }
+          .mise-week-rec-group-dishes {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            padding: 0 0 8px 0;
+            align-items: stretch;
+          }
+          .mise-week-tab .mise-week-subtabs {
+            margin-bottom: 16px;
+          }
+          .mise-week-dishes-sub .mise-week-banner {
+            margin-bottom: 16px;
+          }
+          .mise-week-dishes-sub .mise-week-hr-top {
+            margin-top: 16px;
+          }
+          .mise-week-dishes-sub .mise-week-group-header .mise-week-add-all-btn {
+            margin-left: auto;
+          }
+          .mise-week-tab,
+          .mise-profile-tab {
+            padding-right: 0;
+            box-sizing: border-box;
+          }
+          .mise-detail-overlay,
+          .mise-original-overlay {
+            left: calc(80px + 64px);
+            right: 64px;
+          }
+          .mise-detail-week-pill-wrap {
+            right: 64px !important;
+            display: none !important;
+          }
+          .mise-detail-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+            gap: 24px;
+            align-items: end;
+            box-sizing: border-box;
+            padding-left: 16px;
+            padding-right: 16px;
+            width: 100%;
+          }
+          .mise-detail-hero-visual {
+            grid-column: 2;
+            grid-row: 1;
+            min-width: 0;
+          }
+          .mise-detail-hero-copy {
+            grid-column: 1;
+            grid-row: 1;
+            min-width: 0;
+            max-width: none;
+            width: 100%;
+            padding-top: 24px !important;
+            padding-bottom: 24px !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            overflow-wrap: break-word;
+          }
+          .mise-detail-tabbar {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+          }
+          .mise-detail-ingredients,
+          .mise-detail-instructions {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+          }
+          .mise-detail-notes {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+          }
+          .mise-detail-title-side-actions {
+            display: none !important;
+          }
+          .mise-detail-hero-toolbar {
+            display: flex !important;
+          }
+          .mise-recipe-grid .mise-dish-row,
+          .mise-week-rec-group-dishes .mise-dish-row {
+            flex-direction: column;
+            align-items: stretch;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            gap: 0;
+            padding: 0;
+            border: 1px solid #E8E8E4;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            border-bottom: none;
+          }
+          .mise-recipe-grid .mise-dish-media,
+          .mise-week-rec-group-dishes .mise-dish-media {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 3 / 2;
+            flex-shrink: 0;
+            border-radius: 0;
+            cursor: pointer;
+          }
+          .mise-recipe-grid .mise-dish-blob,
+          .mise-week-rec-group-dishes .mise-dish-blob { display: none; }
+          .mise-recipe-grid .mise-dish-footer,
+          .mise-week-rec-group-dishes .mise-dish-footer {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 16px;
+            align-items: flex-start;
+            gap: 16px;
+          }
+          .mise-recipe-grid .mise-dish-title,
+          .mise-week-rec-group-dishes .mise-dish-title {
+            white-space: normal;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.35;
+          }
+          .mise-recipe-grid .mise-dish-source,
+          .mise-week-rec-group-dishes .mise-dish-source { margin-top: 4px; }
+          .mise-recipe-grid .mise-dish-meta,
+          .mise-week-rec-group-dishes .mise-dish-meta { margin-top: 2px; }
+        }
+        @media (min-width: 920px) {
+          .mise-recipe-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1180px) {
+          .mise-recipe-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1440px) {
+          .mise-recipe-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+        }
       `}</style>
-      <div style={{background:T.surface,padding:"16px 16px 16px 80px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0,position:"relative",opacity:detailDish?0:1,transition:"opacity 0.25s ease",pointerEvents:detailDish?"none":"all"}}>
+      <div className="mise-app-header" style={{background:T.surface,padding:"16px 16px 16px 80px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0,position:"relative",opacity:detailDish?0:1,transition:"opacity 0.25s ease",pointerEvents:detailDish?"none":"all"}}>
         <div style={{fontSize:32,fontWeight:600,letterSpacing:"-0.01em",color:T.text,lineHeight:1,fontFamily:T.fontTitle}}>
           {activeTab==="recipes"?"Recipes":activeTab==="week"?"This Week":"Profile"}
         </div>
-        <div style={{position:"absolute",bottom:0,left:80,right:0,height:1,background:T.border}}/>
+        <div className="mise-app-header-rule" aria-hidden="true"/>
         {activeTab==="recipes"&&<button onClick={()=>setImportOpen(true)} style={{background:T.text,color:"#fff",border:"none",borderRadius:100,padding:"0 16px",height:36,fontSize:12,fontFamily:T.font,fontWeight:600,cursor:"pointer"}}>+ Add</button>}
         {activeTab==="week"&&<span style={{fontSize:12,color:T.muted}}>{weekDishIds.length} dish{weekDishIds.length!==1?"es":""}</span>}
       </div>
-      <div ref={mainScrollRef} style={{flex:1,overflow:"hidden",display:"flex",flexDirection:"column",paddingLeft:80,opacity:detailDish?0:1,transition:"opacity 0.25s ease",pointerEvents:detailDish?"none":"all"}}>
+      <div ref={mainScrollRef} className="mise-app-main" style={{flex:1,overflow:"hidden",display:"flex",flexDirection:"column",paddingLeft:80,opacity:detailDish?0:1,transition:"opacity 0.25s ease",pointerEvents:detailDish?"none":"all"}}>
         {activeTab==="recipes"&&<RecipesTab weekDishIds={weekDishIds} onToggleWeek={handleToggleWeek} onViewDish={setDetailDish} dishes={dishes} initialTag={recipeActiveTag} onTagApplied={()=>setRecipeActiveTag(null)}/>}
         {activeTab==="week"&&<ThisWeekTab weekDishIds={weekDishIds} setWeekDishIds={setWeekDishIds} onViewDish={setDetailDish} dishes={dishes}/>}
         {activeTab==="profile"&&<ProfileTab dishes={dishes}/>}
       </div>
-      <div style={{
+      <div className="mise-nav-rail" style={{
         position:"fixed",
         left:0,
         top:0,
@@ -1419,9 +1814,9 @@ export default function App() {
       </div>
       {importOpen&&<ImportSheet onClose={()=>setImportOpen(false)} onAdd={handleAddDish} activeDishes={dishes.filter(d=>weekDishIds.includes(d.id))}/>}
 
-      {/* DishDetail overlay — slides in from right, starts at 80px to show nav */}
-      <div style={{
-        position:"absolute", top:0, bottom:0, left:80, right:0, zIndex:100,
+      {/* DishDetail overlay — slides in from right; inset matches main column */}
+      <div className="mise-detail-overlay" style={{
+        zIndex:100,
         transform: detailDish ? "translateX(0)" : "translateX(100%)",
         transition: "transform 0.35s cubic-bezier(0.32,0.72,0,1), opacity 0.2s ease",
         opacity: originalDish ? 0 : 1,
@@ -1432,8 +1827,8 @@ export default function App() {
         {detailDish&&<DishDetail dish={detailDish} inWeek={weekDishIds.includes(detailDish.id)} onBack={()=>{setDetailDish(null);setOriginalDish(null);}} onToggleWeek={handleToggleWeek} weekDishIds={weekDishIds} allDishes={dishes} onShowOriginal={()=>setOriginalDish(detailDish)} onShowToast={showToast} onTagSelect={tag=>{setDetailDish(null);setOriginalDish(null);setRecipeActiveTag(tag);}}/>}
       </div>
       {/* Original recipe overlay — third layer */}
-      <div style={{
-        position:"absolute",top:0,bottom:0,left:80,right:0,zIndex:200,
+      <div className="mise-original-overlay" style={{
+        zIndex:200,
         transform:originalDish?"translateX(0)":"translateX(100%)",
         transition:"transform 0.35s cubic-bezier(0.32,0.72,0,1)",
         pointerEvents:originalDish?"all":"none",
@@ -1497,7 +1892,7 @@ export default function App() {
       </div>
 
       {/* Toast */}
-      <div style={{position:"fixed",bottom:toast?90:-80,left:"50%",transform:"translateX(-50%)",transition:"bottom 0.4s cubic-bezier(0.34,1.56,0.64,1)",zIndex:400,maxWidth:400,width:"calc(min(100%, 680px) - 40px)"}}>
+      <div style={{position:"fixed",bottom:toast?90:-80,left:"50%",transform:"translateX(-50%)",transition:"bottom 0.4s cubic-bezier(0.34,1.56,0.64,1)",zIndex:400,maxWidth:400,width:"min(400px, calc(100vw - 32px))"}}>
         {toast&&(
           <div style={{background:"#FFE534",color:"#0033A0",borderRadius:12,padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 4px 20px rgba(0,51,160,0.2)"}}>
             <span style={{fontSize:14,fontFamily:T.font,fontWeight:400}}>{toast.title} added</span>
