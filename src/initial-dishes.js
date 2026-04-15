@@ -79,10 +79,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Fry doubanjiang in hot oil until oil turns red. Add pork; cook until crumbly.",
-      "Add garlic, soy-ginger base, and stock. Simmer gently.",
-      "Slide in tofu; simmer 4–5 min without breaking.",
-      "Thicken with cornstarch slurry. Top with scallions and ground Sichuan pepper."
+      "Fry doubanjiang (Sichuan chili bean paste) in hot oil until the oil turns red, then add the pork and cook until it separates into fine crumbles.",
+      "Stir in the garlic, soy-ginger base, and stock, and let everything simmer gently so the flavors meld.",
+      "Nestle in the silken tofu and simmer for 4–5 minutes without stirring roughly, just until it is heated through.",
+      "Thicken the sauce with cornstarch slurry, then finish with scallions and a snow of ground Sichuan pepper."
     ],
     "original": {
       "ingredients": [
@@ -207,10 +207,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Velvet beef if desired; pat noodles dry.",
-      "Heat wok until very hot. Sear beef; remove.",
-      "Char noodles briefly; add sauce and toss.",
-      "Return beef with sprouts and scallions; high heat toss 1 minute."
+      "If you velvet the beef (brief cornstarch marinade for tenderness), do that first; pat the fresh ho fun noodles completely dry so they sear instead of steaming.",
+      "Heat the wok until it is ripping hot, sear the beef in a flash, then lift it out and set it aside.",
+      "Briefly char the noodles, add the sauce, and toss so every ribbon carries a little smoke and sheen.",
+      "Return the beef with bean sprouts and scallions and give everything a final minute over high heat so the plate tastes of the wok."
     ],
     "original": {
       "ingredients": [
@@ -314,10 +314,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Scramble eggs in hot wok; set aside.",
-      "Add rice; press and char without moving, then toss.",
-      "Return eggs; add soy-ginger base and white pepper.",
-      "Fold in peas and scallions; serve immediately."
+      "Scramble the eggs in a hot wok until they are just set, then slide them out and keep them nearby.",
+      "Add the cold rice, press it into the pan until you pick up some color, then toss to separate the grains.",
+      "Fold the eggs back in with the soy-ginger base and a generous pinch of white pepper.",
+      "Toss through peas and scallions and serve straight away while the rice is still very hot."
     ],
     "original": {
       "ingredients": [
@@ -426,11 +426,11 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Char onion and ginger; toast spices.",
-      "Simmer bones and beef with spices for hours; skim; season with fish sauce.",
-      "Strain broth; keep piping hot.",
-      "Add noodles and raw beef to bowls; ladle boiling broth.",
-      "Serve with herbs, sprouts, lime, and hoisin/sriracha."
+      "Char onion and ginger; toast spices until fragrant.",
+      "Simmer bones and beef for hours with the spice sachet, skimming often; season with fish sauce.",
+      "Strain the broth and keep it at a hard simmer until you are ready to serve.",
+      "Divide noodles and raw beef slices among deep bowls, then ladle in boiling broth—it will cook the beef on contact.",
+      "Serve with herbs, sprouts, lime, and hoisin or sriracha."
     ],
     "original": {
       "ingredients": [
@@ -534,10 +534,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Marinate and cook beef.",
-      "Prepare vegetables separately.",
-      "Mix sauce.",
-      "Arrange rice in bowls; top with beef, veg, egg, and sauce."
+      "Brown the seasoned beef until savory and deep in color.",
+      "Cook each vegetable separately so textures stay distinct.",
+      "Whisk the bibimbap sauce until smooth.",
+      "Top bowls of rice with beef, vegetables, and a fried egg; pass the sauce on the side."
     ],
     "original": {
       "ingredients": [
@@ -630,9 +630,9 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Season salmon; sear skin-side down.",
-      "Brush with teriyaki glaze; finish in oven or flip and baste.",
-      "Serve over rice with vegetables; garnish."
+      "Heat oven to 400°F (200°C). Season salmon, dry the skin, and sear skin-down in an oiled ovenproof skillet until it crackles, ~3 min (don’t force if it sticks).",
+      "Brush glaze on the fish, not bare pan; bake ~8 min, basting once or twice, until centers just set—or pull earlier for rarer fillets.",
+      "Rest briefly, then serve over rice and veg with your garnishes."
     ],
     "original": {
       "ingredients": [
@@ -733,10 +733,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Velvet or marinade chicken.",
-      "Fry chilies and aromatics.",
-      "Stir-fry chicken; add sauce.",
-      "Toss with peanuts and scallions."
+      "Velvet or marinate the chicken until well seasoned.",
+      "Fry dried chilies and aromatics in hot oil until fragrant.",
+      "Return the chicken to the wok and stir-fry until nearly cooked through, then add the sauce and cook until glossy and coating everything.",
+      "Fold in roasted peanuts and scallion pieces."
     ],
     "original": {
       "ingredients": [
@@ -844,10 +844,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Simmer aromatics in coconut and stock.",
-      "Add chicken and mushrooms; poach.",
-      "Season with fish sauce and lime.",
-      "Garnish with cilantro and chili."
+      "Gently simmer lemongrass, galangal (a firm rhizome sold near ginger), and lime leaves in coconut milk and stock until the broth is fragrant and full-flavored.",
+      "Slide in sliced chicken and mushrooms and poach them quietly until the chicken is opaque and the mushrooms yield.",
+      "Balance the pot with fish sauce and a generous squeeze of lime until the soup hums between rich, sour, and salty.",
+      "Ladle into bowls and shower with cilantro and sliced chili for freshness and bite."
     ],
     "original": {
       "ingredients": [
@@ -887,8 +887,8 @@ export const INITIAL_DISHES = [
     "sourceUrl": "https://thewoksoflife.com/hainanese-chicken-rice/",
     "image": "https://thewoksoflife.com/wp-content/uploads/2023/07/hainan-chicken-rice-7.jpg",
     "cuisine": "Singaporean",
-    "cookTime": 90,
-    "servings": 4,
+    "cookTime": 150,
+    "servings": 6,
     "flavorProfile": [
       "aromatic",
       "clean",
@@ -899,81 +899,118 @@ export const INITIAL_DISHES = [
         "type": "component",
         "componentId": "aromatic-base",
         "label": "Poaching liquid",
-        "note": "Add smashed ginger and scallion whites",
+        "note": "12–14 cups water; keep the fat from inside the bird for the rice (see first step)",
         "extras": [
           {
+            "item": "Water",
+            "amount": "12–14 cups",
+            "note": ""
+          },
+          {
             "item": "Fresh ginger",
-            "amount": "6 slices",
+            "amount": "4–5 slices",
             "note": ""
           },
           {
             "item": "Scallions",
-            "amount": "3",
-            "note": "halved"
+            "amount": "2 whole",
+            "note": ""
           },
           {
-            "item": "Salt",
-            "amount": "for water",
-            "note": ""
+            "item": "Kosher salt",
+            "amount": "1 tbsp",
+            "note": "for rubbing the chicken"
+          },
+          {
+            "item": "Ice",
+            "amount": "lots",
+            "note": "large ice bath"
           }
         ]
       },
       {
         "type": "component",
         "componentId": "soy-ginger-base",
-        "label": "Ginger-scallion sauce",
-        "note": "Pour hot oil over minced ginger and scallion",
-        "extras": []
+        "label": "Ginger–garlic oil sauce",
+        "note": "Fry minced ginger and garlic in oil until fragrant, not paste-thick",
+        "extras": [
+          {
+            "item": "Neutral oil",
+            "amount": "3 tbsp",
+            "note": ""
+          }
+        ]
       },
       {
         "type": "dish",
-        "label": "Chicken and rice",
+        "label": "Chicken, rice, and remaining sauces",
         "ingredients": [
           {
             "item": "Whole chicken",
-            "amount": "1.2–1.5 kg",
-            "note": ""
+            "amount": "3–3½ lb / ~1.5 kg",
+            "note": "Buddhist-style or organic if possible"
+          },
+          {
+            "item": "Chicken fat from inside the bird",
+            "amount": "2 oz",
+            "note": "melt in the pan with a little oil"
           },
           {
             "item": "Jasmine rice",
-            "amount": "2 cups raw",
-            "note": "cooked with chicken fat and broth"
+            "amount": "3 cups raw",
+            "note": "washed; cook in poaching broth"
           },
           {
-            "item": "Sesame oil and soy",
-            "amount": "for drizzling",
-            "note": ""
+            "item": "Garlic",
+            "amount": "4 cloves",
+            "note": "minced for rice"
+          },
+          {
+            "item": "Rock sugar, dark soy, fresh chilies, lime, rice vinegar",
+            "amount": "as recipe",
+            "note": "sweet soy + chili sauces"
+          },
+          {
+            "item": "Cucumber",
+            "amount": "optional",
+            "note": "sliced, for serving"
           }
         ]
       }
     ],
     "steps": [
-      "Poach chicken gently with aromatics; ice bath for skin.",
-      "Cook rice with chicken fat and poaching broth.",
-      "Carve chicken; serve with rice, cucumber, and sauces."
+      "Rinse and dry the chicken. Pull off any loose lump of fat from inside the body cavity (the hollow between the legs) and set it aside—you will melt that for the rice. Rub salt all over the skin.",
+      "Bring water, ginger, and scallions to a boil. Lower the chicken breast-side up and add or remove water so the surface barely exposes the breast—this keeps the white meat from overcooking.",
+      "When the liquid boils again, lift the chicken, tilt it so cooler poaching liquid trapped inside the body cavity pours out, then lower it back in. After one more boil, cover, reduce to the barest simmer, and cook 30–35 min (~10–11 min/lb), or 40–50 min if the bird is over 3½ lb.",
+      "Check the thigh by piercing to the bone—the juices should run clear. While you wait, fill a large bowl with ice water.",
+      "Lift the chicken, drain the cavity again, and submerge it in the ice water 15 min without tearing the skin. Drain and cover until carving. Simmer the broth uncovered if you want it more concentrated for the rice.",
+      "For the rice, melt that reserved chicken fat with a little oil, fry garlic briefly, add rinsed rice, and stir ~2 min until the grains look dry and matte at the edges. Cook with poaching broth and salt in a rice cooker, or soak stovetop rice 20 min then simmer covered on low ~15 min.",
+      "Make the sauces: gently fry minced ginger and garlic in oil; simmer rock sugar with water to a syrup and stir in dark soy; blend chiles with ginger, garlic, lime, and vinegar, thinning with broth to a spoonable consistency.",
+      "Carve the chicken and serve at cool room temperature with rice, all three sauces, cucumber if you like, and small bowls of hot seasoned broth."
     ],
     "original": {
       "ingredients": [
         {
-          "item": "Whole chicken",
+          "item": "Whole chicken, water, ginger, scallions, salt, ice",
           "amount": "",
           "note": ""
         },
         {
-          "item": "Rice",
+          "item": "Rice, chicken fat, garlic, poaching broth",
           "amount": "",
           "note": ""
         },
         {
-          "item": "Ginger, scallion, oil",
+          "item": "Ginger–garlic oil, sweet dark soy, chili–lime sauce",
           "amount": "",
           "note": ""
         }
       ],
       "steps": [
-        "Poach chicken.",
-        "Make aromatic rice.",
-        "Serve with chili and ginger sauces."
+        "Rub salt on the bird; save interior fat for rice; poach; dump liquid from inside the bird; simmer 30–35 min; thigh juices clear.",
+        "Ice bath 15 min; drain; optionally reduce broth for rice.",
+        "Toast rice in melted fat; cook in broth; prepare three sauces.",
+        "Carve and serve with rice, sauces, and broth."
       ]
     },
     "notes": ""
@@ -1034,10 +1071,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Marinate pork 8–24 hours.",
-      "Roast on a rack, basting with reserved marinade.",
-      "Glaze at high heat until lacquered.",
-      "Rest; slice thinly."
+      "Marinate the pork overnight or up to a full day.",
+      "Roast on a rack, basting often, until the edges curl and caramelize.",
+      "Turn the oven or broiler high for a final glaze pass until the surface looks shiny with a little char.",
+      "Let the meat rest, then carve paper-thin slices for serving."
     ],
     "original": {
       "ingredients": [
@@ -1089,6 +1126,26 @@ export const INITIAL_DISHES = [
             "item": "Crushed tomatoes",
             "amount": "700–800 g",
             "note": ""
+          },
+          {
+            "item": "Dried oregano",
+            "amount": "1½ tsp",
+            "note": ""
+          },
+          {
+            "item": "Kosher salt",
+            "amount": "to taste",
+            "note": "for the sauce"
+          },
+          {
+            "item": "Black pepper",
+            "amount": "freshly ground",
+            "note": "to taste"
+          },
+          {
+            "item": "Red pepper flakes",
+            "amount": "pinch",
+            "note": "optional"
           }
         ]
       },
@@ -1120,15 +1177,20 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Brown sausage if using; simmer tomato layer.",
-      "Toss par-cooked pasta with some sauce.",
-      "Layer pasta, sauce, mozzarella, and parmesan in a baking dish.",
-      "Bake until bubbling and golden on top."
+      "Brown sausage if using; simmer tomatoes until deep and sweet, scraping the pan as needed.",
+      "Boil ziti until almost al dente (still slightly firm in the center), drain, and toss with a scoop of sauce.",
+      "Layer pasta, sauce, mozzarella, and parmesan in a deep dish, pressing lightly.",
+      "Bake uncovered ~375°F/190°C until bubbling through and the top is well browned."
     ],
     "original": {
       "ingredients": [
         {
-          "item": "Ziti, tomatoes, garlic, olive oil",
+          "item": "Ziti or rigatoni, crushed tomatoes, onion, garlic, olive oil",
+          "amount": "",
+          "note": ""
+        },
+        {
+          "item": "Dried oregano, salt, black pepper, red pepper flakes",
           "amount": "",
           "note": ""
         },
@@ -1138,15 +1200,16 @@ export const INITIAL_DISHES = [
           "note": ""
         },
         {
-          "item": "Italian sausage or mushrooms",
+          "item": "Italian sausage",
           "amount": "optional",
           "note": ""
         }
       ],
       "steps": [
-        "Build a simple tomato sauce.",
-        "Layer with pasta and cheeses.",
-        "Bake until browned."
+        "Simmer sauce with sausage if using.",
+        "Par-boil pasta; toss with some sauce.",
+        "Layer pasta, sauce, cheeses.",
+        "Bake until bubbling and golden."
       ]
     },
     "notes": ""
@@ -1207,9 +1270,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Brine chicken in seasoned buttermilk at least 8 hours.",
-      "Drain; roast at high heat until skin is crisp and meat is cooked.",
-      "Rest before carving."
+      "Soak the chicken at least 8 hours in seasoned buttermilk so it seasons through.",
+      "About an hour before roasting, take the chicken out to lose the chill; drain marinade and pat the skin very dry.",
+      "Roast hot (~425°F/220°C) on a rack until deeply golden and an instant-read thermometer reads 165°F (74°C) at the thigh, not touching bone.",
+      "Rest ~15 minutes before carving."
     ],
     "original": {
       "ingredients": [
@@ -1225,9 +1289,9 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Brine overnight.",
-        "Roast until done.",
-        "Rest and carve."
+        "Buttermilk brine 8+ hours.",
+        "Dry skin; roast hot until 165°F at thigh.",
+        "Rest; carve."
       ]
     },
     "notes": ""
@@ -1288,9 +1352,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Simmer tomato base until deep red; blend; stir in cream.",
-      "Butter bread; griddle sandwiches until golden and melted.",
-      "Serve soup with grilled cheese."
+      "Simmer the tomato base to a jammy red; season, then purée until silky.",
+      "Off heat (or over low), stir in cream until plush but still bright; loosen with stock if needed.",
+      "Griddle buttered sandwiches until bronze and molten in the middle.",
+      "Serve soup with grilled cheese for dunking."
     ],
     "original": {
       "ingredients": [
@@ -1311,8 +1376,9 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Cook soup; purée.",
-        "Make grilled cheeses.",
+        "Simmer; purée; season.",
+        "Fold in cream; adjust consistency.",
+        "Griddle sandwiches.",
         "Serve together."
       ]
     },
@@ -1374,9 +1440,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Roast tomatoes and aromatics until concentrated.",
-      "Simmer with stock; blend until smooth.",
-      "Top oven crocks with bread and cheddar; broil."
+      "Roast tomatoes, onion, and garlic until concentrated; scrape all the browned bits from the pan into the pot.",
+      "Simmer with stock 15–20 min, then blend until smooth; strain if you want it finer.",
+      "Adjust salt; add sugar only if the tomatoes are harsh.",
+      "Ladle into heatproof crocks or bowls, top with bread and cheddar, and broil until blistered and brown."
     ],
     "original": {
       "ingredients": [
@@ -1397,9 +1464,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Roast vegetables.",
-        "Blend soup.",
-        "Broil cheesy tops."
+        "Roast veg; scrape pan.",
+        "Simmer with stock; blend; strain optional.",
+        "Adjust seasoning.",
+        "Broil cheesy tops on crocks."
       ]
     },
     "notes": ""
@@ -1465,10 +1533,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Boil pasta; reserve water.",
-      "Cook mushrooms in herb & garlic oil until deep golden.",
-      "Toss pasta with mushrooms, butter, cheese, and pasta water.",
-      "Finish with parsley."
+      "Boil the pasta until shy of al dente and reserve a mug of the starchy water.",
+      "Sizzle the mushrooms in herb and garlic oil until they lose their squeak and turn mahogany at the edges.",
+      "Toss the noodles with mushrooms, butter, parmesan, and just enough pasta water to gloss the strands.",
+      "Scatter parsley over the top so the bowl tastes green and bright at the finish."
     ],
     "original": {
       "ingredients": [
@@ -1551,9 +1619,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Simmer tomato base with chickpeas, stock, and rosemary.",
-      "Add pasta; cook until tender.",
-      "Season; serve with olive oil and parmesan."
+      "Simmer tomatoes with chickpeas, stock, and rosemary; mash a few chickpeas for body if you like.",
+      "Add pasta; simmer until tender, stirring and splashing in water if it dries out.",
+      "Remove and discard the woody rosemary stems.",
+      "Adjust seasoning and serve with a drizzle of olive oil and grated parmesan."
     ],
     "original": {
       "ingredients": [
@@ -1570,8 +1639,9 @@ export const INITIAL_DISHES = [
       ],
       "steps": [
         "Simmer chickpeas in tomato broth.",
-        "Cook pasta in the same pot.",
-        "Finish with good olive oil."
+        "Cook pasta; stir; thin if needed.",
+        "Remove rosemary.",
+        "Finish with oil and cheese."
       ]
     },
     "notes": ""
@@ -1632,9 +1702,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Melt zucchini into a sauce with garlic oil and butter.",
-      "Cook pasta; toss with zucchini mixture and parmesan.",
-      "Add lemon zest and pasta water for gloss."
+      "Cook shredded zucchini low with garlic oil and butter until jammy and the pan is mostly dry.",
+      "Boil spaghetti a minute shy of al dente; reserve starchy water.",
+      "Toss pasta with zucchini, parmesan, and just enough water to coat.",
+      "Finish with zest and lemon juice."
     ],
     "original": {
       "ingredients": [
@@ -1655,8 +1726,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Cook zucchini until butter-soft.",
-        "Toss with pasta."
+        "Reduce zucchini slowly to a jammy base.",
+        "Par-cook pasta; save water.",
+        "Toss with parmesan and water.",
+        "Finish with zest and lemon."
       ]
     },
     "notes": ""
@@ -1730,9 +1803,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Cook spinach; drain very well; mix with feta, dill, scallions, and lemon.",
-      "Layer buttered phyllo in a pan; add filling; top with more phyllo.",
-      "Bake until deep gold and crisp."
+      "Wilt the spinach, cool it, then squeeze out as much water as you can before mixing with feta, dill, scallions, and lemon.",
+      "Work quickly: keep phyllo under a damp towel; butter between sheets and drape with overhang.",
+      "Fill, fold or top with more phyllo, then cut shallow diamond slits through only the top layers so steam can escape.",
+      "Bake until deep gold and crisp, rotating once if needed."
     ],
     "original": {
       "ingredients": [
@@ -1748,9 +1822,9 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Make filling.",
-        "Layer phyllo.",
-        "Bake until crisp."
+        "Wring spinach dry; mix filling.",
+        "Butter and layer phyllo; fill.",
+        "Score top; bake until deep gold."
       ]
     },
     "notes": ""
@@ -1824,10 +1898,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Sauté aromatics with cumin and chipotle.",
-      "Add tomato base and stock; simmer.",
-      "Add chicken; taste.",
-      "Serve with crunchy tortillas and garnishes."
+      "Sauté onion and garlic with cumin and minced chipotle until the kitchen fills with smoke and warmth.",
+      "Pour in the tomato base and stock, then simmer until the soup tastes cohesive and bold.",
+      "Fold in shredded chicken, season thoughtfully, and adjust heat and salt.",
+      "Serve in deep bowls with crisp tortillas, lime, avocado, and whatever bright garnish you crave."
     ],
     "original": {
       "ingredients": [
@@ -1911,10 +1985,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Marinate or brush chicken with miso glaze.",
-      "Sear chicken skin-side down.",
-      "Nestle rice and stock in the same pan; cover and bake until chicken and rice are done.",
-      "Rest; fluff rice; garnish with scallions."
+      "Coat the chicken evenly in miso glaze.",
+      "Sear skin-side down until deep golden brown and the skin releases from the pan on its own.",
+      "Add rice and stock, cover, and bake until the chicken is cooked through and the rice has absorbed the liquid.",
+      "Let rest, then fluff the rice with a fork and scatter sliced scallions on top."
     ],
     "original": {
       "ingredients": [
@@ -1955,8 +2029,8 @@ export const INITIAL_DISHES = [
       {
         "type": "component",
         "componentId": "warm-spice-blend",
-        "label": "Masala spices",
-        "note": "Add Kashmiri chili and garam masala",
+        "label": "Tikka spice blend",
+        "note": "Masala spice blend plus Kashmiri chili for this dish (see below).",
         "extras": [
           {
             "item": "Kashmiri chili powder",
@@ -1968,8 +2042,8 @@ export const INITIAL_DISHES = [
       {
         "type": "component",
         "componentId": "tomato-base",
-        "label": "Tomato masala",
-        "note": "Finish with cream and butter",
+        "label": "Tomato base",
+        "note": "Simmer until glossy and the oil separates; then finish with cream and butter below.",
         "extras": [
           {
             "item": "Heavy cream",
@@ -2006,10 +2080,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Marinate chicken in yogurt and spices; grill or broil with char.",
-      "Make tomato masala; simmer.",
-      "Simmer grilled chicken in sauce with cream and butter.",
-      "Serve with basmati and cilantro."
+      "Marinate chicken in yogurt, Tikka spice blend (Masala spice blend + Kashmiri chili—see ingredients), and garlic–ginger paste; grill or broil until blistered at the edges.",
+      "Simmer Tomato base until the oil separates and you see a slick on the surface.",
+      "Add chicken, heavy cream, and butter; simmer gently until tender and the sauce clings.",
+      "Serve over basmati with cilantro."
     ],
     "original": {
       "ingredients": [
@@ -2086,9 +2160,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Deglaze onions with wine; add stock and thyme; simmer.",
-      "Toast bread slices with cheese.",
-      "Broil cheese-topped crocks until brown."
+      "Deglaze onions with wine, add stock and thyme, simmer 20–30 min, skimming if you want a clear soup.",
+      "Taste and salt boldly—onion soups often need more than you think.",
+      "Top crocks with toast and a thick layer of cheese.",
+      "Broil until blistered; mind the hot bowls."
     ],
     "original": {
       "ingredients": [
@@ -2110,7 +2185,8 @@ export const INITIAL_DISHES = [
       ],
       "steps": [
         "Caramelize onions deeply.",
-        "Simmer soup.",
+        "Deglaze; simmer with stock.",
+        "Taste; adjust salt.",
         "Top with bread and cheese; broil."
       ]
     },
@@ -2166,6 +2242,11 @@ export const INITIAL_DISHES = [
             "note": ""
           },
           {
+            "item": "Baby bok choy",
+            "amount": "200 g",
+            "note": "halved or quartered lengthwise"
+          },
+          {
             "item": "Ya cai or preserved veg",
             "amount": "2 tbsp",
             "note": ""
@@ -2174,9 +2255,11 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Crisp pork with ya cai.",
-      "Divide sauce in bowls; add noodles.",
-      "Top with pork, scallions, and chili oil."
+      "Brown the ground pork with ya cai (Sichuan preserved mustard greens) until the meat is crisp at the edges.",
+      "Bring a large pot of well-salted water to a rolling boil and cook the noodles for exactly the time the package suggests.",
+      "During the final minute or two, tuck in baby bok choy until the leaves turn vivid and tender-crisp, then drain the noodles with care.",
+      "Whisk the sauce into each bowl, twist in the hot noodles, and toss lightly so every strand carries sesame and heat.",
+      "Top with the pork, scallions, and as much chili oil as your conscience allows."
     ],
     "original": {
       "ingredients": [
@@ -2194,6 +2277,7 @@ export const INITIAL_DISHES = [
       "steps": [
         "Make sauce base.",
         "Cook pork.",
+        "Boil noodles; finish greens; drain.",
         "Assemble bowls."
       ]
     },
@@ -2262,10 +2346,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Simmer chickpeas in spiced tomato gravy.",
-      "Mash a few chickpeas for body.",
-      "Finish with lemon or amchur and cilantro.",
-      "Serve with rice or roti."
+      "Simmer the chickpeas in spiced tomato gravy until the spices taste mellow and the chickpeas swell softly.",
+      "Mash a handful against the pot wall so the sauce clings like a proper curry.",
+      "Brighten with lemon or amchur and a handful of cilantro so the pot finishes tangy and fresh.",
+      "Serve with rice or warm roti for scooping."
     ],
     "original": {
       "ingredients": [
@@ -2338,9 +2422,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Boil potatoes; drain; smash flat.",
-      "Roast flipped once until shatteringly crisp.",
-      "Season aggressively."
+      "Boil potatoes in salted water until tender; drain and steam-dry briefly.",
+      "Oil a hot sheet pan, add potatoes, and smash to ragged coins.",
+      "Roast hot, flipping once, until deeply crisp.",
+      "Salt and pepper while hot."
     ],
     "original": {
       "ingredients": [
@@ -2361,9 +2446,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Boil.",
-        "Smash.",
-        "Roast hot until crisp."
+        "Boil until tender; steam-dry.",
+        "Pre-heat pan; smash.",
+        "Roast until crisp.",
+        "Season hot."
       ]
     },
     "notes": ""
@@ -2419,10 +2505,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Press dough into oiled rectangular pan.",
-      "Add cheese to edges.",
-      "Top sauce in stripes; add pepperoni.",
-      "Bake until frico edge forms."
+      "Stretch the dough into a well-oiled Detroit pan, coaxing it into the corners like a relaxed focaccia.",
+      "Cover the dough with cheese edge to edge so a crisp ring of fried cheese can form against the pan.",
+      "Stripe the sauce across the top, scatter pepperoni that will curl into cups, and slide the pan into a hot oven.",
+      "Bake until the rim is crisp with fried cheese and the center is set and blistery."
     ],
     "original": {
       "ingredients": [
@@ -2506,9 +2592,9 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Simmer chicken in broth in a small covered pan.",
-      "Drizzle in eggs; cover until softly set.",
-      "Slide over rice; garnish with scallion."
+      "Simmer seasoned dashi with chicken in one layer, covered, until the meat is opaque and cooked through—keep it below a rolling boil.",
+      "Pour in the beaten eggs in a loose figure eight, cover, and let them set 1–2 minutes until softly set and still a little jiggly in the middle.",
+      "Slide the chicken and egg over hot rice, spoon any broth from the pan on top, and finish with sliced scallions."
     ],
     "original": {
       "ingredients": [
@@ -2524,9 +2610,9 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Poach chicken in seasoned broth.",
-        "Set eggs on top.",
-        "Serve over rice."
+        "Simmer chicken gently in seasoned dashi until done.",
+        "Add eggs; cover; set softly.",
+        "Serve over hot rice with scallions."
       ]
     },
     "notes": ""
@@ -2587,9 +2673,9 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Marinate chicken.",
-      "Double-fry for shatter crust.",
-      "Toss in gochujang-honey garlic glaze if desired."
+      "Marinate well; drip dry, then dust lightly with starch for a thin crust.",
+      "Fry once at moderate heat to cook through, rest, then fry hotter until the crust is hollow and shatteringly crisp.",
+      "Optional: toss off heat in gochujang-honey glaze; shower with sesame."
     ],
     "original": {
       "ingredients": [
@@ -2610,9 +2696,9 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Marinate.",
-        "Fry twice.",
-        "Glaze and serve."
+        "Marinate; starch-dredge.",
+        "Double-fry.",
+        "Glaze; sesame."
       ]
     },
     "notes": ""
@@ -2673,9 +2759,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Batter and fry cauliflower until crisp.",
-      "Toss with glaze.",
-      "Top with sesame and scallions."
+      "Heat the oil to the temperature given in your recipe, and fry in batches so it does not cool down too much.",
+      "Fry until the crust crackles and a skewer meets little resistance in the thickest part of a floret.",
+      "Drain the cauliflower briefly, then toss with glaze while everything is still hot so the sauce clings without sogging the crust.",
+      "Finish with toasted sesame seeds and sliced scallions."
     ],
     "original": {
       "ingredients": [
@@ -2696,9 +2783,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Fry cauliflower.",
-        "Glaze.",
-        "Garnish."
+        "Heat oil; fry in batches.",
+        "Fry until crisp.",
+        "Glaze hot.",
+        "Sesame and scallion."
       ]
     },
     "notes": ""
@@ -2759,9 +2847,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Beer-batter or blacken fish.",
-      "Fry or grill until cooked.",
-      "Serve on tortillas with slaw and lime."
+      "Pat fish dry, season; keep beer batter cold and barely mixed.",
+      "Shallow-fry in batches or blacken in a ripping-hot pan until edges char.",
+      "Cook until the thickest part flakes but stays moist—thin fillets finish fast.",
+      "Warm tortillas; fill with fish, slaw, crema, lime, and hot sauce."
     ],
     "original": {
       "ingredients": [
@@ -2777,9 +2866,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Cook fish.",
-        "Warm tortillas.",
-        "Assemble tacos."
+        "Dry fish; cold batter if using.",
+        "Fry or blacken in batches.",
+        "Check flaking at thickest part.",
+        "Warm tortillas; assemble."
       ]
     },
     "notes": ""
@@ -2830,9 +2920,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Coat salmon in miso marinade; refrigerate overnight if possible.",
-      "Roast or broil until edges caramelize and center is cooked.",
-      "Garnish with lemon and sesame."
+      "Coat the salmon with miso paste and refrigerate up to overnight, or as little as 30 minutes.",
+      "Scrape excess if needed; roast or broil until the glaze chars a little and the centers yield—flake to your taste.",
+      "Rest a few minutes off the heat.",
+      "Serve with lemon and toasted sesame."
     ],
     "original": {
       "ingredients": [
@@ -2848,8 +2939,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Marinate.",
-        "Roast until glossy and caramelized."
+        "Marinate 30 min–overnight.",
+        "Roast or broil to doneness.",
+        "Brief rest.",
+        "Lemon and sesame."
       ]
     },
     "notes": ""
@@ -2917,9 +3010,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Marinate chicken at least 1 hour.",
-      "Roast high heat until edges darken.",
-      "Slice thinly; stuff pitas with salads and sauces."
+      "Marinate at least 1 hour (or overnight), working paste under the skin if you can.",
+      "Roast on a rack over a sheet pan until edges curl and char; baste if the recipe says to.",
+      "When the chicken hits temp or juices run clear, rest briefly before slicing.",
+      "Slice the chicken thin and serve stuffed in pitas with salad and cool sauces."
     ],
     "original": {
       "ingredients": [
@@ -2935,9 +3029,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Marinate.",
-        "Roast.",
-        "Serve in flatbread."
+        "Marinate deeply.",
+        "Roast on rack until colored.",
+        "Rest briefly.",
+        "Slice thin into pitas."
       ]
     },
     "notes": ""
@@ -3003,9 +3098,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Marinate beef 30 min up to overnight.",
-      "Sear in screaming hot skillet in batches.",
-      "Serve with rice and lettuce wraps."
+      "Marinate sliced beef 30 min to overnight.",
+      "Shake off drips; sear in screaming-hot batches so each piece chars.",
+      "Garnish with scallion or sesame if you like.",
+      "Serve with rice, lettuce, and pickles."
     ],
     "original": {
       "ingredients": [
@@ -3022,7 +3118,9 @@ export const INITIAL_DISHES = [
       ],
       "steps": [
         "Marinate.",
-        "Grill or sear."
+        "Shake off liquid; sear in batches.",
+        "Garnish.",
+        "Serve with rice and lettuce."
       ]
     },
     "notes": ""
@@ -3096,10 +3194,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Pressure- or slow-cook lentils with spices and tomato.",
-      "Mash some dal for silkiness.",
-      "Finish with cream.",
-      "Bloom tarka in ghee; pour over."
+      "Pressure- or slow-cook the lentils with spices and tomato until the dal is creamy and patient with itself.",
+      "Mash a portion against the pot so the gravy gains body without losing whole beans for texture.",
+      "Stir in cream until the pot looks glossy and indulgent.",
+      "Sizzle the tarka seasonings in hot ghee (the finishing spiced oil) and pour it over the dal at the table."
     ],
     "original": {
       "ingredients": [
@@ -3173,9 +3271,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Whisk dressing with herbs.",
-      "Toss cold pasta with peas, fennel, and dressing.",
-      "Chill briefly before serving."
+      "Boil pasta to al dente; cool in a single layer (rinse only if the recipe says so).",
+      "Whisk dressing until smooth and pourable; thin if stiff.",
+      "Toss pasta with peas and fennel; dress lightly and taste for salt and acid.",
+      "Chill the salad 20–30 minutes, then toss once more right before serving."
     ],
     "original": {
       "ingredients": [
@@ -3196,9 +3295,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Cook pasta.",
-        "Blend dressing.",
-        "Toss and chill."
+        "Cook and cool pasta.",
+        "Blend dressing; adjust.",
+        "Toss with vegetables.",
+        "Chill; re-toss; serve."
       ]
     },
     "notes": ""
@@ -3259,9 +3359,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Roast tomatoes, broccolini, lemon, and feta until tomatoes burst.",
-      "Mash feta into vegetables.",
-      "Serve over grains."
+      "Toss the vegetables and lemon with oil, salt, and pepper; tuck the feta block where tomato juices will run under it without burning.",
+      "Roast until tomatoes slump and broccolini tips color; feta should slump when poked.",
+      "Mash feta into the veg on the tray; loosen with a splash of water or stock if needed.",
+      "Spoon over grains or orzo while hot."
     ],
     "original": {
       "ingredients": [
@@ -3272,8 +3373,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Roast everything on one sheet.",
-        "Stir into creamy sauce."
+        "Prep sheet; season.",
+        "Roast until jammy and tender.",
+        "Mash feta into veg.",
+        "Serve over grains."
       ]
     },
     "notes": ""
@@ -3349,9 +3452,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Combine dry ingredients.",
-      "Fold in ricotta mixture (and whipped whites if using).",
-      "Griddle small pancakes until golden."
+      "Whisk the dry ingredients, breaking up any lumps of baking powder.",
+      "Beat ricotta, buttermilk, eggs, zest, and vanilla; fold into dries; fold in whites last if using—stop when just combined.",
+      "Butter a griddle over medium; drop small rounds with space to spread.",
+      "Cook until lacy at the edge and bubbled on top; flip once and stack while centers are still a little soft."
     ],
     "original": {
       "ingredients": [
@@ -3362,9 +3466,10 @@ export const INITIAL_DISHES = [
         }
       ],
       "steps": [
-        "Make batter.",
-        "Cook pancakes.",
-        "Serve with syrup or fruit."
+        "Whisk dries.",
+        "Fold in wet ricotta mix (and whites).",
+        "Butter griddle; drop batter.",
+        "Flip when set; stack."
       ]
     },
     "notes": ""
@@ -3442,10 +3547,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Cream butter with sugars; add eggs and vanilla.",
-      "Mix flours, soda, salt; combine.",
-      "Fold chocolate; chill dough 24–36 hours.",
-      "Scoop and bake until edges brown."
+      "Cream softened butter with both sugars until the mixture looks like damp sand, then beat in eggs and vanilla until silky.",
+      "Whisk the flours, baking soda, and salt, then mix into the butter base until the dough just comes together.",
+      "Fold in the chocolate and chill the dough a full day when you can—patience rewards you with depth.",
+      "Scoop generous mounds and bake until the edges spread into brown lace and the centers still look slightly underdone."
     ],
     "original": {
       "ingredients": [
@@ -3537,10 +3642,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Slow-cook onions and fennel until deeply sweet.",
-      "Toast rice in the pan; deglaze with wine.",
-      "Add stock in stages, stirring, until creamy.",
-      "Finish with butter, parmesan, and parsley."
+      "Slow-cook onions and fennel until they collapse into something jammy and wine-dark sweet.",
+      "Toast the rice in that aromatic base, deglaze with wine, and stir until the pan smells like a trattoria.",
+      "Add warm stock in patient ladlefuls, stirring often, until the rice is creamy but still has a heartbeat.",
+      "Swirl in butter, parmesan, and parsley so the risotto finishes glossy and assertively savory."
     ],
     "original": {
       "ingredients": [
@@ -3632,10 +3737,10 @@ export const INITIAL_DISHES = [
       }
     ],
     "steps": [
-      "Mix meats with herbs, soaked breadcrumbs, and seasoning.",
-      "Rest shaped meatballs.",
-      "Broil or pan-fry until browned and cooked through.",
-      "Serve with tzatziki and warm pita."
+      "Mix beef, lamb, herbs, soaked crumbs, and spices until combined but light.",
+      "Roll the mixture into meatballs and let them rest a few minutes so they hold together in the pan.",
+      "Broil or pan-fry until browned outside and cooked through with clear juices.",
+      "Serve with tzatziki, pita, and salad."
     ],
     "original": {
       "ingredients": [

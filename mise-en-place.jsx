@@ -11,8 +11,8 @@ const T = {
 // ─── Component Library ────────────────────────────────────────────────────────
 const COMPONENT_LIBRARY = {
   "aromatic-base":{id:"aromatic-base",name:"Aromatic base",category:"foundation",cookTime:15,days:3,storage:"Airtight container, refrigerated.",description:"Sweat onion, garlic, and ginger in butter or oil over medium heat until deep golden, 12–15 min.",ingredients:[{item:"Onion",amount:"1 large",note:"finely diced"},{item:"Garlic",amount:"5 cloves",note:"minced"},{item:"Fresh ginger",amount:"1 tbsp",note:"grated"},{item:"Neutral oil",amount:"2 tbsp",note:"or butter"}]},
-  "tomato-base":{id:"tomato-base",name:"Tomato base",category:"sauce",cookTime:30,days:4,storage:"Airtight container, refrigerated.",description:"Cook onion and garlic in olive oil until soft. Add crushed tomatoes, simmer 20–25 min until thick and deep red.",ingredients:[{item:"Crushed tomatoes",amount:"400g",note:"canned"},{item:"Onion",amount:"1 medium",note:"diced"},{item:"Garlic",amount:"4 cloves",note:"minced"},{item:"Olive oil",amount:"2 tbsp",note:""}]},
-  "warm-spice-blend":{id:"warm-spice-blend",name:"Warm spice blend",category:"seasoning",cookTime:5,days:30,storage:"Airtight jar, room temperature.",description:"Dry-toast cumin, paprika, and garam masala in a pan 2–3 min until fragrant. Cool then combine.",ingredients:[{item:"Cumin",amount:"2 tsp",note:"ground"},{item:"Smoked paprika",amount:"1 tsp",note:""},{item:"Garam masala",amount:"1 tsp",note:""},{item:"Coriander",amount:"1 tsp",note:"ground"}]},
+  "tomato-base":{id:"tomato-base",name:"Tomato base",category:"sauce",cookTime:30,days:4,storage:"Airtight container, refrigerated.",description:"Cook onion and garlic in olive oil until soft. Add crushed tomatoes, simmer 20–25 min until thick and deep red.",ingredients:[{item:"Crushed tomatoes",amount:"400g",note:"canned"},{item:"Onion",amount:"1 medium",note:"diced"},{item:"Garlic",amount:"4 cloves",note:"minced"},{item:"Olive oil",amount:"2 tbsp",note:""}],instructions:["Warm Tomato base in a wide pan over medium heat until it loosens and just begins to steam at the edges.","Add salt, pepper, and dry herbs or spices exactly as listed for Tomato base in this dish (including any extras such as oregano or chili flakes), then cook—stirring often—until the oil looks glossy and the sauce smells deeper.","Simmer gently to marry the flavors, then fold in cream and butter only when this recipe lists them; if adding cooked meat, simmer just until everything is hot and Tomato base coats the back of a spoon."]},
+  "warm-spice-blend":{id:"warm-spice-blend",name:"Masala spice blend",category:"seasoning",cookTime:5,days:30,storage:"Airtight jar, room temperature.",description:"Dry-toast cumin, paprika, and garam masala in a pan 2–3 min until fragrant. Cool then combine.",ingredients:[{item:"Cumin",amount:"2 tsp",note:"ground"},{item:"Smoked paprika",amount:"1 tsp",note:""},{item:"Garam masala",amount:"1 tsp",note:""},{item:"Coriander",amount:"1 tsp",note:"ground"}],instructions:["Set a dry skillet over medium heat. When the metal feels warm, add Masala spice blend and stir almost constantly until it smells toasty and aromatic—pull it off the heat if anything hints at burning.","Tip Masala spice blend into a bowl and let it cool before you fold it into the dish."]},
   "herb-garlic-oil":{id:"herb-garlic-oil",name:"Herb & garlic oil",category:"oil/fat",cookTime:10,days:5,storage:"Covered jar, refrigerated.",description:"Warm olive oil with smashed garlic and thyme over low heat 8–10 min until fragrant. Do not boil.",ingredients:[{item:"Olive oil",amount:"80ml",note:"good quality"},{item:"Garlic",amount:"4 cloves",note:"smashed"},{item:"Fresh thyme",amount:"4 sprigs",note:""},{item:"Fresh rosemary",amount:"2 sprigs",note:"optional"}]},
   "citrus-acid":{id:"citrus-acid",name:"Citrus acid base",category:"acid",cookTime:5,days:3,storage:"Airtight container, refrigerated.",description:"Whisk citrus juice with oil and a pinch of salt. Use as marinade base, dressing, or brightener. Add garlic only when the recipe calls for it (use extras on this component).",ingredients:[{item:"Lemon or lime",amount:"3",note:"juiced"},{item:"Olive oil",amount:"3 tbsp",note:""},{item:"Salt",amount:"pinch",note:""}]},
   "miso-glaze":{id:"miso-glaze",name:"Miso glaze",category:"sauce",cookTime:5,days:7,storage:"Jar, refrigerated.",description:"Whisk miso, mirin, and soy together until smooth.",ingredients:[{item:"White miso",amount:"3 tbsp",note:""},{item:"Mirin",amount:"2 tbsp",note:""},{item:"Soy sauce",amount:"1 tbsp",note:""},{item:"Sesame oil",amount:"1 tsp",note:""}]},
@@ -69,8 +69,21 @@ const normalizeRecipePageKey = (url) => {
 
 // ─── Dish model
 // groups: array of group objects, each one of:
-//   {type:"component", componentId, label, extras:[], note}   — references canonical component
-//   {type:"dish",      label,       ingredients:[]}            — standalone group
+//   {type:"component", componentId, label, extras:[], note}   — references COMPONENT_LIBRARY
+//   {type:"dish",      label,       ingredients:[]}         — standalone group
+//
+// Authoring component groups (keep ingredients + instructions + Mise en place tab aligned):
+// • `label` is the name of this ingredient *group* on the recipe card. Use COMPONENT_LIBRARY[componentId].name
+//   when the group is exactly that prep; use a different `label` when the recipe is a *composed* use of the base
+//   (e.g. label "Tikka spice blend" + componentId warm-spice-blend). The UI shows: group title → base name →
+//   base ingredients (indented) → `extras` (labeled “Also for this recipe”).
+// • For a plain base with no recipe-specific title, set `label` to the library name (e.g. "Tomato base").
+// • List only recipe-specific items in `extras` (not already in the shared base). If the dish needs
+//   more spices than the shared blend, either add them as `extras` here or extend the library entry—
+//   do not imply a wholly separate "tikka blend" unless it uses a different componentId.
+// • In `steps` and in COMPONENT_LIBRARY `instructions`, use the library `name` verbatim (e.g. “add Masala spice blend”),
+//   not generic phrases like “your spice blend”.
+//
 // original: {ingredients:[{item,amount,note}], steps:[]} — verbatim recipe
 // Seed data: see ./src/initial-dishes.js (40 publisher recipes).
 // ─────────────────────────────────────────────────────────────────────────────
@@ -140,6 +153,851 @@ const sumAmounts = (a, b) => {
   return display + (pa.unit?" "+pa.unit:"");
 };
 
+/** Sum the same amount string n times (for scaling shared prep when n recipes use that component). */
+const sumAmountNTimes = (amount, n) => {
+  const k = Math.max(0, Math.floor(Number(n) || 0));
+  if (k <= 1) return amount || "";
+  let a = amount || "";
+  for (let i = 1; i < k; i++) a = sumAmounts(a, amount || "");
+  return a;
+};
+
+/** Noodles/pasta already timed by the label — skip rolling-boil + “package” done-when we’d repeat. */
+const stepTextUsesPackageCookingTime = (text) =>
+  /\b(package\s+time|package\s+directions?|on\s+the\s+package|per\s+the\s+package|per\s+package|according\s+to\s+(the\s+)?package|as\s+(the\s+)?package\s+directs?)\b/i.test(
+    text || "",
+  );
+
+/** True when the step text already gives a duration — avoid duplicating. */
+const stepTextHasExplicitTiming = (text) =>
+  /\d+\s*([–\-~]|to)\s*\d*\s*(min|minute|minutes|sec|second|seconds|hr|hour)s?\b/i.test(text) ||
+  /\b\d+\s*-\s*\d+\s*min\b/i.test(text) ||
+  /\b\d+\s*(min|minute|minutes|sec|second|seconds)s?\b/i.test(text) ||
+  /\b\d+\s*(hr|hour)s?\b/i.test(text) ||
+  /\bfor\s+hours?\b|\bseveral\s+hours\b|\b(low\s+)?simmer\s+.*\bhours?\b/i.test(text || "") ||
+  stepTextUsesPackageCookingTime(text);
+
+/** Already states doneness or defers to package — skip our completion line. */
+const stepTextHasExplicitDone = (text) => /\buntil\b/i.test(text) || stepTextUsesPackageCookingTime(text);
+
+/** Simmer/brace for hours without a numeric hour count — show a broad timing column estimate. */
+const stepImpliesLongVagueHours = (text) => {
+  const s = (text || "").toLowerCase();
+  if (/\d+\s*(hr|hour)s?\b/i.test(s)) return false;
+  return (
+    /\bfor\s+hours?\b/.test(s) ||
+    /\bseveral\s+hours\b/.test(s) ||
+    (/\bsimmer\b/.test(s) && /\bhours?\b/.test(s))
+  );
+};
+
+/** Show heuristic timing only when it helps execution (not serving / quick toss-together steps). */
+const instructionTimingWorthShowing = (stepText, timingDisplay) => {
+  if (!timingDisplay) return false;
+  const s = (stepText || "").toLowerCase();
+  if (/\b(serve|serving|garnish|plate|plating)\b|\btop with\b|\bfinish with\b|\bdig in\b|\benjoy\b/.test(s)) return false;
+  const td = timingDisplay.replace(/^~\s*/, "").trim();
+  if (/^(~?\s*)?1\s*min\b/i.test(td) && /\b(combine|mix together|whisk together|stir together)\b/i.test(s)) return false;
+  return true;
+};
+
+/** Collapse “5–15 min”–style ranges to the longest value for the timing column. */
+const collapseTimingRangesToMax = (t) => {
+  if (!t || typeof t !== "string") return t;
+  let s = t.trim();
+  s = s.replace(/\b(package\s+time\s*\+\s*)(\d+)\s*[–—\-~]\s*(\d+)\s*min\b/gi, (_, pre, a, b) => `${pre}${Math.max(Number(a), Number(b))} min`);
+  s = s.replace(/\b(\d+)\s*min\s*[–—\-~]\s*(\d+)\s*(hr|hrs|hours)\b(?:\s*\([^)]*\))?/gi, (_, a, b) => {
+    const maxMin = Math.max(Number(a), Number(b) * 60);
+    if (maxMin >= 60 && maxMin % 60 === 0) return `${maxMin / 60} hr`;
+    return `${maxMin} min`;
+  });
+  s = s.replace(/\b(\d+)\s*[–—\-~]\s*(\d+)\s*(min|minutes|mins)\b/gi, (_, a, b) => `${Math.max(Number(a), Number(b))} min`);
+  s = s.replace(/\b(\d+)\s*[–—\-~]\s*(\d+)\s*(hr|hrs|hours)\b/gi, (_, a, b) => `${Math.max(Number(a), Number(b))} hr`);
+  return s.replace(/\s{2,}/g, " ").trim();
+};
+
+const normalizeHeuristicTiming = (t, stepText) => {
+  if (!t) return null;
+  const low = t.toLowerCase();
+  if (/long cook|use the time range in these instructions/.test(low)) {
+    const st = (stepText || "").toLowerCase();
+    if (/slow\s*cook|crock|\bbrai[sz]e?\b/.test(st)) return "8 hr";
+    return "3 hr";
+  }
+  return collapseTimingRangesToMax(t.replace(/^~\s*/, "").trim());
+};
+
+/** Pull a duration already written in the step for the timing column (e.g. "4–5 min"). */
+const extractExplicitTimingPhrase = (text) => {
+  if (!text) return null;
+  const rangeMin = text.match(/\b(\d+)\s*[–—\-~]\s*(\d+)\s*(min|minutes)\b/i);
+  if (rangeMin) return `${rangeMin[1]}–${rangeMin[2]} min`;
+  const rangeHr = text.match(/\b(\d+)\s*[–—\-~]\s*(\d+)\s*(hr|hrs|hours)\b/i);
+  if (rangeHr) return `${rangeHr[1]}–${rangeHr[2]} hr`;
+  const singleMin = text.match(/\b(\d+)\s*(min|minutes)\b/i);
+  if (singleMin) return `${singleMin[1]} min`;
+  const singleHr = text.match(/\b(\d+)\s*(hr|hrs|hours)\b/i);
+  if (singleHr) return `${singleHr[1]} hr`;
+  return null;
+};
+
+/** Collapse awkward gaps left after pulling durations into the timing column. */
+const tidyInstructionBodyAfterTimingStrip = (s) => {
+  if (!s) return s;
+  let t = s.replace(/\s{2,}/g, " ").replace(/\s+\./g, ".").trim();
+  t = t.replace(/\b(for|about)\s+\./gi, ".");
+  t = t.replace(/,\s*\./g, ".");
+  t = t.replace(/\.\s*\./g, ".");
+  return t.trim();
+};
+
+/** If stripping durations would leave a stub (“Simmer.” / “Cook stirring.”), keep the original wording. */
+const instructionBodyLooksBrokenAfterTimingStrip = (s) => {
+  if (!s?.trim()) return true;
+  const sentences = s.split(/\.\s+/).map((x) => x.trim()).filter(Boolean);
+  for (const sent of sentences) {
+    const last = sent.replace(/\.+$/, "").trim();
+    if (!last) return true;
+    if (/\b(simmer|cook|boil|bake|roast|fry|sear|poach|braise)\s*$/i.test(last)) return true;
+    if (/\bcook\s+stirring$/i.test(last)) return true;
+    if (/\bstirring\s*$/i.test(last) && !/until|while|as\s+/i.test(last)) return true;
+    if (/\s\.$/.test(sent)) return true;
+  }
+  return false;
+};
+
+/** Remove a duration from the publisher text when it’s duplicated in the timing column. */
+const stripExplicitTimingFromBase = (text, phrase) => {
+  if (!text || !phrase) return text;
+  const mRange = phrase.match(/^(\d+)–(\d+)\s*min$/i);
+  if (mRange) {
+    const re = new RegExp(
+      `(?:,\\s*)?(?:\\bfor\\s+(?:about\\s+)?)?(?:\\babout\\s+)?(?:for the last\\s+)?\\b${mRange[1]}\\s*[–—\\-~]\\s*${mRange[2]}\\s*(?:min|minutes)(?:\\s+of cooking)?\\b\\.?`,
+      "i",
+    );
+    return tidyInstructionBodyAfterTimingStrip(text.replace(re, ""));
+  }
+  const hRange = phrase.match(/^(\d+)–(\d+)\s*hr$/i);
+  if (hRange) {
+    const re = new RegExp(
+      `(?:,\\s*)?(?:\\bfor\\s+)?(?:\\babout\\s+)?\\b${hRange[1]}\\s*[–—\\-~]\\s*${hRange[2]}\\s*(?:hr|hrs|hours)\\b\\.?`,
+      "i",
+    );
+    return tidyInstructionBodyAfterTimingStrip(text.replace(re, ""));
+  }
+  const m1 = phrase.match(/^(\d+)\s*min$/i);
+  if (m1) {
+    const re = new RegExp(
+      `(?:,\\s*)?(?:\\bfor\\s+(?:about\\s+)?)?(?:\\babout\\s+)?(?:for the last\\s+)?\\b${m1[1]}\\s*(?:min|minutes)(?:\\s+of cooking)?\\b\\.?`,
+      "i",
+    );
+    return tidyInstructionBodyAfterTimingStrip(text.replace(re, ""));
+  }
+  const h1 = phrase.match(/^(\d+)\s*hr$/i);
+  if (h1) {
+    const re = new RegExp(
+      `(?:,\\s*)?(?:\\bfor\\s+)?(?:\\babout\\s+)?\\b${h1[1]}\\s*(?:hr|hrs|hours)\\b\\.?`,
+      "i",
+    );
+    return tidyInstructionBodyAfterTimingStrip(text.replace(re, ""));
+  }
+  return text;
+};
+
+/**
+ * Generalized timing + doneness (heuristic) for weaving into the instruction text.
+ */
+const inferStepGuidance = (stepText) => {
+  if (!stepText || typeof stepText !== "string") return null;
+  const t = stepText.trim();
+  if (!t) return null;
+  const s = t.toLowerCase();
+  const hasTime = stepTextHasExplicitTiming(t);
+  const hasDone = stepTextHasExplicitDone(t);
+  const rules = [
+    {
+      test: () => /marinate|marinade|\bsoak\b/.test(s),
+      d: "~30 min–2 hrs (or overnight)",
+      w: "the marinade has clung—the surface looks moist and the aroma is stronger—and you still haven’t tasted raw meat or poultry.",
+    },
+    { test: () => /\bpreheat\b/.test(s), d: "~10–15 min", w: "the oven or pan has reached the target temperature and the heat feels steady." },
+    { test: () => /\b(blend|puree|process)\b/.test(s), d: "~1–3 min", w: "everything looks smooth with no coarse bits and the color is even." },
+    {
+      test: () => /\b(bake|roast)\b/.test(s),
+      d: hasTime ? null : "~20–45 min (by thickness)",
+      w: "the crust and color match what you want, and the center feels tender or done to your liking—check with a skewer or thermometer when you’re unsure.",
+    },
+    { test: () => /\bbroil\b/.test(s), d: "~3–8 min", w: "the top has the char you want—broilers move fast, so stay close." },
+    {
+      test: () => /\bsimmer\b/.test(s),
+      d: hasTime ? null : "~8–20 min",
+      w: "you see small steady bubbles and the liquid has thickened slightly from where you started.",
+    },
+    {
+      /** Boil pasta/noodles but add greens or veg near the end—generic “rolling boil” guidance skips the second phase. */
+      test: () =>
+        /\b(boil|rolling boil)\b/.test(s) &&
+        /\b(noodle|noodles|pasta|ramen|udon|soba|rice noodle)\b/.test(s) &&
+        /\b(add\b[\s\S]{0,200}\blast\b|\blast\s+(minute|few|1[\s–\-]?2|one|two)\b|toward\s+the\s+end)/i.test(t),
+      d: hasTime ? null : "Package time + 1–2 min",
+      w: "the water is at a full rolling boil, the noodles are tender per the package time, quick-cooking greens added near the end look bright green and tender-crisp after about 1–2 minutes, and you’re ready to drain.",
+    },
+    {
+      test: () => /\b(boil|rolling boil)\b/.test(s),
+      d: hasTime ? null : "~5–15 min",
+      w: "the liquid is at a full rolling boil with vigorous bubbles, and for pasta or grains the package timing is usually your best guide.",
+    },
+    { test: () => /\bsteam\b/.test(s), d: "~8–15 min", w: "a skewer or knife pierces easily and vegetables still look bright." },
+    {
+      test: () => /\breduce\b/.test(s),
+      d: hasTime ? null : "~5–15 min",
+      w: "the liquid lightly coats the back of a spoon instead of running off like water.",
+    },
+    { test: () => /cornstarch|slurry|\bthicken\b/.test(s), d: "~1–3 min, stirring", w: "the sauce turns glossy and clings to the food." },
+    { test: () => /\brest\b/.test(s) && /meat|steak|chop|roast|breast|loin/.test(s), d: "~5–15 min", w: "juices stay in the meat when you slice." },
+    {
+      test: () => /\b(grill)\b/.test(s),
+      d: "~3–10 min per side (heat-dependent)",
+      w: "grill marks and exterior color look right, and the interior matches the temperature or firmness you’re after.",
+    },
+    {
+      test: () => /\b(scramble|whisk|beat)\b.*\begg/.test(s) || /\begg(s)?\b.*\b(scramble|whisk)\b/.test(s),
+      d: "~1–2 min",
+      w: "the eggs are just set and still a little creamy unless you prefer them fully dry.",
+    },
+    {
+      test: () => /instant pot|pressure cooker|\bpressure\b/.test(s),
+      d: "~10–30 min under pressure (varies by cut)",
+      w: "pressure has fully released and you can open the cooker safely, and tougher cuts are fork-tender when that’s what you’re after.",
+    },
+    {
+      test: () => /slow cook|crock|brais/.test(s),
+      d: "Long cook — use the time range in these instructions",
+      w: "the meat is fork-tender and the collagen has melted into the cooking liquid.",
+    },
+    { test: () => /chill|refrigerat|cool completely/.test(s), d: "~30 min–2+ hrs", w: "the dish feels chilled through or set the way this style of recipe should." },
+    { test: () => /toast(ed)?\b.*\b(spice|nut|seed)/.test(s) || /\btoast\b.*cumin|coriander|spice/.test(s), d: "~2–4 min", w: "the spices or seeds smell noticeably fragrant without smoking." },
+    {
+      test: () => /wok|very hot|smoking|rippling|sear|char\b/.test(s),
+      d: "~2–6 min active",
+      w: "the pan gives a strong sizzle and proteins or vegetables pick up the sear and color you want.",
+    },
+    {
+      test: () => /stir-?fry|high heat|toss vigorously|toss.*hot/.test(s),
+      d: "~3–8 min",
+      w: "vegetables are tender-crisp and proteins are cooked through—or still deliberately rare if the dish works that way.",
+    },
+    {
+      test: () => /deep fry|deep-fry/.test(s),
+      d: "~3–6 min per batch",
+      w: "the crust is golden, bubbling has calmed, and thicker pieces pass a quick cut test if you’re unsure.",
+    },
+    {
+      test: () => /\bfry\b|sauté|saute|\bbrown\b/.test(s) && !/stir-?fry/.test(s),
+      d: "~3–8 min",
+      w: "color has deepened and the food releases from the pan more cleanly when it’s ready to flip.",
+    },
+    {
+      test: () =>
+        /poach|barely a simmer/.test(s) &&
+        /\bwhole\s+(chicken|bird)\b|\bentire\s+chicken\b|\bbird\s+breast-side|\bbreast-side\s+up\b/i.test(t),
+      d: "~30–45 min at a bare simmer (weight-dependent)",
+      w: "juices from a skewer to the thigh bone run clear and the breast stayed just above the waterline as intended.",
+    },
+    { test: () => /gentle|low heat|poach/.test(s), d: "~5–15 min", w: "the liquid stays below a hard rolling boil unless you mean to push it that far." },
+    { test: () => /tofu|slide in|nestle/.test(s), d: "~4–10 min", w: "the tofu is heated through and still holds its shape if you began with a soft block." },
+    {
+      test: () => /\b(combine|mix together|whisk together|stir together)\b/.test(s) && !/heat|pan|wok|simmer|boil/.test(s),
+      d: "~1 min",
+      w: "the mixture looks even in color with no dry pockets or streaks.",
+    },
+    {
+      test: () => /\b(serve|serving|garnish|plate|plating)\b|\btop with\b|\bfinish with\b/.test(s),
+      d: null,
+      w: "everything is warm enough to eat and arranged the way you like.",
+    },
+  ];
+  let duration = null;
+  let doneWhen = null;
+  for (const r of rules) {
+    if (!r.test()) continue;
+    if (!hasTime && r.d) duration = r.d;
+    if (!hasDone && r.w) doneWhen = r.w;
+    break;
+  }
+  if (!duration && !doneWhen) return null;
+  return { duration, doneWhen };
+};
+
+/** Shorthand jargon in steps; `woven` is a full sentence that continues the instruction naturally (order = match priority). */
+const COOKING_TERM_HINTS = [
+  {
+    re: /\bvelvet(ed|ing)?\b/i,
+    label: "Velveting",
+    woven: "If velveting isn’t a phrase you’ve heard before, it’s when you coat thin-sliced meat in cornstarch (often with a little egg white or baking soda) and give it a quick pass through hot oil or simmering water so it stays juicy and silky instead of chewy.",
+  },
+  {
+    re: /\bdeglaz(e|ing)\b/i,
+    label: "Deglazing",
+    woven: "Deglazing is just splashing stock, wine, or water into the hot pan and scraping up the browned fond while it bubbles—that dissolves all that flavor into the sauce.",
+  },
+  {
+    re: /\bsweat(ing)?\b/i,
+    label: "Sweating",
+    woven: "Sweating means cooking chopped aromatics gently in fat until they’re soft and sweet without taking on much color—think medium-low heat, sometimes with a lid ajar.",
+  },
+  {
+    re: /\bbloom(ing)?\b/i,
+    label: "Blooming",
+    woven: "Blooming spices means warming them in fat until intensely fragrant, which pulls the flavor into the oil before you add anything wet—just pull the pan off before they scorch.",
+  },
+  {
+    re: /\btemper(ing)?\b.*\bchocolate\b|\btemper(ed)?\s+chocolate\b/i,
+    label: "Tempering chocolate",
+    woven: "Tempering chocolate is a careful melt-and-cool rhythm so cocoa butter sets shiny and snappy; it’s worth using a thermometer because real chocolate has tight temperature targets.",
+  },
+  {
+    re: /\btemper(ing)?\b/i,
+    label: "Tempering",
+    woven: "Here, tempering means drizzling the hot liquid into eggs or dairy little by little so they warm up gently and don’t curdle before everything goes back on the heat.",
+  },
+  {
+    /** Hyphenated “oven-proof”, “heat-proof”, etc.—word boundary sits after “-”, so plain \bproof would false-match. */
+    re: /(?<![-–—])\bproof(ing)?\b/i,
+    label: "Proofing",
+    woven: "Proofing is simply letting the yeasted dough rest in a warm spot until it relaxes and rises—usually puffy and roughly doubled if the recipe gives a visual cue.",
+  },
+  {
+    re: /\bscald(ing)?\b/i,
+    label: "Scalding",
+    woven: "Scalding milk or cream means heating it until it’s steaming hot with tiny bubbles at the edge but not a full rolling boil—common before folding into batters or chocolate.",
+  },
+];
+
+/** Step text that actually handles animal protein (land meats, fish, shellfish)—not e.g. “fish sauce”. */
+const stepInvolvesMeat = (t) => {
+  const s = t || "";
+  if (!s) return false;
+  if (
+    /\b(beef|veal|pork|lamb|mutton|chicken|turkey|duck|goose|steak|mince|ground|breast|thigh|drumstick|wing|chop|cutlet|ribs?|sausage|brisket|sirloin|tenderloin|fillet|fillets?)\b/i.test(
+      s,
+    )
+  )
+    return true;
+  if (/\b(shrimp|prawns?|scallops?|mussels?|clams?|lobster|crab|squid|calamari)\b/i.test(s)) return true;
+  return /\b(salmon|cod|tuna|halibut|bass|trout|tilapia|snapper|mackerel|swordfish|monkfish|catfish|sea\s+bass|arctic\s+char|fish(?!\s+sauce))\b/i.test(s);
+};
+
+/** Remove carry-over meat words from fat/stock/sauce so “cook rice in chicken fat” is not treated as cooking chicken. */
+const stripIncidentalMeatPhrases = (s) =>
+  (s || "")
+    .replace(/\b(chicken|beef|pork|duck|turkey|goose)\s+fat\b/gi, "")
+    .replace(/\b(beef|chicken|pork|fish|vegetable|bone)\s+(stock|broth|bouillon)\b/gi, "")
+    .replace(/\b(fish|oyster)\s+sauce\b/gi, "");
+
+/**
+ * Safe-temperature appendixes belong on steps where meat/seafood is actually cooked (heat, finishing oven, etc.),
+ * not on marinate, brine, mix, rest-only, or carve steps.
+ */
+const stepInvolvesCookingMeat = (t) => {
+  const s = t || "";
+  if (!stepInvolvesMeat(stripIncidentalMeatPhrases(s))) return false;
+  const lead = s.trim().slice(0, 48).toLowerCase();
+  if (
+    (/^(rest|carve|slice|serve|transfer\s+to\s+a\s+platter)\b/.test(lead) || /^let\s+[^.]{0,36}\brest\b/.test(lead)) &&
+    !/\b(oven|broiler|sear|fry|brown|bake|cook|simmer|poach|grill|roast\s+on|high\s+heat)\b/i.test(s)
+  )
+    return false;
+  if (/\bmarinate\s+and\s+cook\b/i.test(s)) return true;
+  if (/\bhigh\s+heat\b/i.test(s) && /\b(glaze|baste|finish|sear|carameliz|char|toss|wok)\b/i.test(s)) return true;
+  if (
+    /\b(velvet(ing|ed)?|sear(ing|ed)?|saut[eé](ing|ed)?|pan[- ]fry|stir[- ]fry|deep[- ]fry|fry(ing|ed)?\b|fried\b|grill(ed|ing)?|roast(s|ed|ing)?|bbq|barbecue|broil(ed|ing)?|simmer(ed|ing)?|boil(ed|ing)?|poach(ed|ing)?|brais(e|ing|ed)|stew(ed|ing)?|brown(ed|ing)?\b|char(red|ring)?|baste|griddle|blacken(ed|ing)?|double[- ]fry|smoke\b|carameliz|under\s+the\s+broiler|pressure[- ]cook|slow[- ]cook)\b/i.test(
+      s,
+    )
+  )
+    return true;
+  if (
+    /\bcook(s|ing|ed)?\b[^.!?]{0,90}\b(beef|veal|pork|lamb|mutton|chicken|turkey|duck|goose|steak|ground|breast|thigh|drumstick|wing|chop|ribs?|sausage|brisket|fillet|fillets?|salmon|cod|tuna|shrimp|prawns?|fish(?!\s+sauce)|scallops?|meatballs?|meat\b)/i.test(
+      s,
+    ) ||
+    /\b(beef|veal|pork|lamb|chicken|turkey|duck|salmon|cod|tuna|shrimp|prawns?|fish(?!\s+sauce)|fillet|fillets?|meatballs?)\b[^.!?]{0,90}\bcook(s|ing|ed)?\b/i.test(
+      s,
+    )
+  )
+    return true;
+  if (/\boven\b/i.test(s) && /\b(minutes?|bake|roast|preheat|°F|°C|\d{3}\s*°)\b/i.test(s)) return true;
+  if (/\b(finish|transfer|slide|nestle)\b[\s\S]{0,60}\b(oven|broiler)\b/i.test(s)) return true;
+  if (
+    /\buntil\s+[^.!?]{0,120}\b(cooked\s+through|fully\s+cooked|no\s+pink|opaque\s+and|flakes?\s+easily|internal\s+temp|thermometer)\b/i.test(
+      s,
+    )
+  )
+    return true;
+  return false;
+};
+
+/**
+ * Meat safe-temp appendix: only when the step actually signals doneness or the end of cooking protein
+ * (visual cues, thermometer, explicit target °F/°C, or a timed simmer/bake/roast of the meat itself).
+ */
+const stepDescribesMeatDonenessOrFinishedCooking = (t) => {
+  const raw = t || "";
+  const s = stripIncidentalMeatPhrases(raw).toLowerCase();
+  if (!stepInvolvesMeat(s) || !stepInvolvesCookingMeat(raw)) return false;
+  if (/°f|°\s*c|\b\d{3}\s*°/i.test(raw)) return true;
+  if (
+    /\b(cooked\s+through|fully\s+cooked|cook\s+through|doneness|finish(?:es|ed)?\s+cooking|done\s+cooking|finished\s+cooking)\b/.test(s)
+  )
+    return true;
+  if (/\bnearly\s+cooked\s+through\b/.test(s)) return true;
+  if (
+    /\b(juices?\s+run\s+clear|opaque\b|flakes?\s+(?:cleanly|easily)|no\s+pink|fork[\s-]?tender|fall[\s-]?off[\s-]?the[\s-]?bone)\b/.test(
+      s,
+    )
+  )
+    return true;
+  if (/\b(instant[\s-]?read|thermometer|internal\s+temp)/i.test(s)) return true;
+  if (/\b(reaches?|hits?|reads?)\s+\d{2,3}\b/i.test(s)) return true;
+  if (/\b(check|test)\b[\s\S]{0,50}\b(?:done|doneness|temp|temperature|cooked|clear)\b/i.test(s)) return true;
+  if (/\b(medium(?:[\s-]?(?:rare|well))?|well\s+done)\b/i.test(s)) return true;
+  if (
+    /\buntil\b[\s\S]{0,150}\b(?:cooked\s+through|heated\s+through|fully\s+cooked|opaque|flake|flak|juices?\s+run\s+clear|no\s+pink|done|thermometer|\d+\s*°|degrees|just\s+set|set\s+at\s+the\s+bone|tender\s+when|quivers?)\b/i.test(
+      s,
+    )
+  )
+    return true;
+  if (
+    /\b(simmer|poach|braise|roast|bake|broil|grill|fry|cook)\b[\s\S]{0,140}\b\d+\s*[–—\-~]\s*\d+\s*(?:min|minutes)\b/i.test(s) &&
+    /\b(chicken|bird|turkey|duck|goose|pork|beef|lamb|veal|meat|thigh|breast|wing|drumstick|fillet|salmon|cod|tuna|fish|shrimp|prawns?|meatballs?|ground\s+(?:beef|pork|lamb))\b/i.test(
+      s,
+    )
+  )
+    return true;
+  if (/\b(meat|chicken|pork|beef|lamb|turkey|duck)\s+is\s+tender\b/i.test(s)) return true;
+  if (/\bcooks?\s+the\s+(?:meat|beef)\b/i.test(s)) return true;
+  if (/\bhits?\s+temperature\b/i.test(s)) return true;
+  return false;
+};
+
+/** Per-ingredient line unlikely to be a solid cut (avoid “beef” in stock). */
+const ingredientLineIsMeatCarrier = (line) => {
+  const L = (line || "").toLowerCase();
+  if (!L.trim()) return false;
+  if (/\b(beef|chicken|pork|lamb)\s+(stock|broth|bouillon|base)\b/.test(L)) return false;
+  if (/\b(fish|oyster)\s+sauce\b/.test(L)) return false;
+  return true;
+};
+
+/** Meat categories present in ingredient list blob (from this dish only). */
+const parseMeatProfileFromBlob = (blobRaw) => {
+  const b = (blobRaw || "").toLowerCase();
+  const lines = b.split("|").map((s) => s.trim()).filter(Boolean);
+  const scan = (predicate) => lines.some((line) => ingredientLineIsMeatCarrier(line) && predicate(line));
+  const groundBeef =
+    scan((L) => /\bground\s+beef\b|\bminced\s+beef\b|\bbeef\s+mince\b/.test(L) || (/\bbeef\b/.test(L) && /\bground\b|\bmince(d)?\b/.test(L)));
+  /** Avoid “Salmon fillets” / “tuna steak” firing `fillet` / `steak` without beef on the line. */
+  const wholeBeef = scan((L) => {
+    if (/\bground\b|\bmince(d)?\b/.test(L)) return false;
+    if (!/\bbeef\b/.test(L) && /\bsalmon|cod|halibut|trout|tilapia|snapper|mackerel|swordfish|monkfish|catfish|sea\s+bass|arctic\s+char|\bfish\b|\btuna\b/.test(L))
+      return false;
+    return /\bbeef\b|steak|brisket|sirloin|chuck|ribeye|short\s+rib|wagyu|stewing\s+beef|cubes?\s+of\s+beef|\bbeef\s+fillet\b|\bfillet\s+steak\b|\bfillet\s+mignon\b|\bfillet\s+of\s+beef\b/i.test(L);
+  });
+  const groundPork =
+    scan((L) => /\bground\s+pork\b|\bpork\s+mince\b|\bminced\s+pork\b/.test(L) || (/\bpork\b/.test(L) && /\bground\b|\bmince/.test(L)));
+  const wholePork = scan(
+    (L) =>
+      (/\bpork\b|\bchop\b|bacon|belly|shoulder|tenderloin|prosciutto|ham\b|sausage/.test(L) ||
+        (/\bribs?\b/.test(L) && /\bpork\b/.test(L))) &&
+      !/\bground\b|\bmince/.test(L) &&
+      !/\bfish\s+sauce\b/.test(L),
+  );
+  const groundLamb =
+    scan((L) => /\bground\s+lamb\b|\blamb\s+mince\b/.test(L) || (/\blamb\b/.test(L) && /\bground\b|\bmince/.test(L)));
+  const wholeLamb = scan((L) => (/\blamb\b|mutton|rack\s+of\s+lamb/.test(L)) && !/\bground\b|\bmince/.test(L));
+  const poultry = scan((L) => /chicken|turkey|duck|goose|quail|poultry|drumstick|wing|thigh|breast/.test(L));
+  const fish = scan((L) => /salmon|cod|tuna|halibut|bass|trout|tilapia|\bfish\b|sea bass|snapper|mackerel/.test(L));
+  const shellfish = scan((L) => /shrimp|prawn|scallop|mussel|clam|lobster|crab|squid|calamari/.test(L));
+  return { groundBeef, wholeBeef, groundPork, wholePork, groundLamb, wholeLamb, poultry, fish, shellfish };
+};
+
+const collectIngredientLinesFromDish = (dish) => {
+  const lines = [];
+  for (const g of dish?.groups || []) {
+    if (g.type === "dish") {
+      for (const ing of g.ingredients || []) {
+        lines.push(`${ing.item || ""} ${ing.note || ""}`.trim());
+      }
+    } else if (g.type === "component") {
+      const lib = COMPONENT_LIBRARY[g.componentId];
+      for (const ing of lib?.ingredients || []) lines.push(`${ing.item || ""} ${ing.note || ""}`.trim());
+      for (const ing of g.extras || []) lines.push(`${ing.item || ""} ${ing.note || ""}`.trim());
+    }
+  }
+  return lines;
+};
+
+const getMeatProfileForInstructions = (dish, originalIngredients) => {
+  if (originalIngredients?.length) {
+    const blob = originalIngredients.map((ing) => `${ing.item || ""} ${ing.note || ""}`.trim()).join(" | ");
+    return parseMeatProfileFromBlob(blob);
+  }
+  if (!dish) return parseMeatProfileFromBlob("");
+  return parseMeatProfileFromBlob(collectIngredientLinesFromDish(dish).join(" | "));
+};
+
+/** Rows for safe-temp appendix (key = dedupe id for “mention once per meat type”). */
+const MEAT_APPENDIX_ROWS = [
+  ["groundBeef", (p) => p.groundBeef, "ground beef should reach 160°F (71°C)"],
+  ["groundPork", (p) => p.groundPork, "ground pork should reach 160°F (71°C)"],
+  ["groundLamb", (p) => p.groundLamb, "ground lamb should reach 160°F (71°C)"],
+  ["wholeBeef", (p) => p.wholeBeef, "whole beef cuts are typically done at 145°F (63°C) after a short rest"],
+  ["wholePork", (p) => p.wholePork, "whole pork cuts are typically done at 145°F (63°C) after a short rest"],
+  ["wholeLamb", (p) => p.wholeLamb, "whole lamb cuts are typically done at 145°F (63°C) after a short rest"],
+  ["poultry", (p) => p.poultry, "poultry should reach 165°F (74°C) in the thickest part"],
+  ["fish", (p) => p.fish, "fish should reach 145°F (63°C), or look opaque and flake easily in the thickest part"],
+  ["shellfish", (p) => p.shellfish, "shellfish should be firm and opaque throughout when fully cooked"],
+];
+
+/** Full appendix (e.g. single-step preview); no cross-step dedupe. */
+const meatSafeTempsAppendixForProfile = (profile) => {
+  const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
+  const parts = [];
+  for (const [, pred, text] of MEAT_APPENDIX_ROWS) {
+    if (pred(profile)) parts.push(cap(text));
+  }
+  if (!parts.length)
+    return "Safe internal temperatures vary by protein—use a reference chart when no target temperature is given.";
+  return `${parts.join(". ")}.`;
+};
+
+/** Only sentences for meat types not yet mentioned in this instruction list; mutates `usedKeys`. */
+const meatAppendixForProfileAndUsage = (profile, usedKeys) => {
+  const cap = (p) => p.charAt(0).toUpperCase() + p.slice(1);
+  const parts = [];
+  for (const [key, pred, text] of MEAT_APPENDIX_ROWS) {
+    if (!pred(profile) || usedKeys.has(key)) continue;
+    usedKeys.add(key);
+    parts.push(cap(text));
+  }
+  if (!parts.length) {
+    const anyRow = MEAT_APPENDIX_ROWS.some(([, pred]) => pred(profile));
+    if (!anyRow && !usedKeys.has("genericChart")) {
+      usedKeys.add("genericChart");
+      return "Safe internal temperatures vary by protein—use a reference chart when no target temperature is given.";
+    }
+    return "";
+  }
+  return `${parts.join(". ")}.`;
+};
+
+const meatDoneFallbackLine = (profile, usedKeys) => {
+  const rows = [
+    profile.groundBeef && { k: "groundBeef", b: "160°F (71°C) for ground beef" },
+    profile.groundPork && { k: "groundPork", b: "160°F (71°C) for ground pork" },
+    profile.groundLamb && { k: "groundLamb", b: "160°F (71°C) for ground lamb" },
+    profile.wholeBeef && { k: "wholeBeef", b: "145°F (63°C) for whole beef after resting" },
+    profile.wholePork && { k: "wholePork", b: "145°F (63°C) for whole pork after resting" },
+    profile.wholeLamb && { k: "wholeLamb", b: "145°F (63°C) for whole lamb after resting" },
+    profile.poultry && { k: "poultry", b: "165°F (74°C) for poultry" },
+    profile.fish && { k: "fish", b: "145°F (63°C) for fish" },
+    profile.shellfish && { k: "shellfish", b: "firm, opaque shellfish" },
+  ].filter(Boolean);
+
+  if (!rows.length) return "Then cook until browned outside and safely done inside (use a thermometer if unsure).";
+
+  if (!usedKeys) {
+    return `Then cook until browned outside and safely done inside—${rows.map((r) => r.b).join(", ")}.`;
+  }
+
+  const pending = rows.filter((r) => !usedKeys.has(r.k));
+  if (!pending.length) {
+    return "Then cook until browned outside and safely done inside (use a thermometer if unsure).";
+  }
+  pending.forEach((r) => usedKeys.add(r.k));
+  return `Then cook until browned outside and safely done inside—${pending.map((r) => r.b).join(", ")}.`;
+};
+
+/**
+ * Second sentence for marinate-and-cook. When `usedKeys` is set, skip repeating °F for meat types
+ * already covered earlier in the recipe instructions (same Set as the meat appendix).
+ */
+const meatDoneLineForTarget = (targetPhrase, profile, usedKeys = null) => {
+  const x = (targetPhrase || "").toLowerCase();
+  const P = profile || parseMeatProfileFromBlob("");
+  const u = usedKeys;
+  const add = (...keys) => {
+    if (u) keys.forEach((k) => u.add(k));
+  };
+  const allUsed = (keys) => u != null && keys.length > 0 && keys.every((k) => u.has(k));
+
+  if (/chicken|turkey|duck|goose|poultry|drumstick|wing|thigh|breast/.test(x)) {
+    if (!P.poultry) {
+      if (allUsed(["poultry"])) {
+        return "Then cook until browned as needed and the center reaches safe doneness for the poultry you’re cooking.";
+      }
+      add("poultry");
+      return "Then cook until browned as needed and the center reaches safe doneness for the poultry you’re cooking—165°F (74°C) in the thickest part if it’s chicken or turkey.";
+    }
+    if (allUsed(["poultry"])) {
+      return "Then cook until browned as needed and the thickest part is fully cooked—no pink at the bone for joints.";
+    }
+    add("poultry");
+    return "Then cook until browned as needed and the thickest part reaches 165°F (74°C)—no pink at the bone for joints.";
+  }
+  if (/ground|mince|minced/.test(x) || (/\bbeef\b/.test(x) && P.groundBeef && !P.wholeBeef)) {
+    const beefOnlyGround = /\bbeef\b/.test(x) && P.groundBeef && !P.wholeBeef;
+    const keys = beefOnlyGround
+      ? ["groundBeef"]
+      : [P.groundBeef && "groundBeef", P.groundPork && "groundPork", P.groundLamb && "groundLamb"].filter(Boolean);
+    if (keys.length && allUsed(keys)) {
+      return "Then brown and cook through until no pink remains in the center.";
+    }
+    add(...keys);
+    return "Then brown and cook through until no pink remains in the center and the temperature hits 160°F (71°C).";
+  }
+  if (/pork|chop|loin/.test(x) && !/ground/.test(x)) {
+    if (P.groundPork && !P.wholePork) {
+      if (allUsed(["groundPork"])) {
+        return "Then brown and cook the ground pork until no pink remains in the thickest part.";
+      }
+      add("groundPork");
+      return "Then brown and cook the ground pork until no pink remains and it reaches 160°F (71°C).";
+    }
+    if (!P.wholePork && !P.groundPork) {
+      if (allUsed(["groundPork", "wholePork"])) {
+        return "Then cook until browned outside and any pork in the pan reaches a safe internal temperature.";
+      }
+      add("groundPork", "wholePork");
+      return "Then cook until browned outside and any pork in the pan reaches a safe internal temperature—160°F (71°C) if it’s ground, 145°F (63°C) with a rest if it’s a whole cut.";
+    }
+    if (P.wholePork && !P.groundPork) {
+      if (allUsed(["wholePork"])) {
+        return "Then cook until browned outside and the center is safely done after a short rest.";
+      }
+      add("wholePork");
+      return "Then cook until browned outside and the center reaches 145°F (63°C), then rest a few minutes.";
+    }
+    if (allUsed(["wholePork", "groundPork"])) {
+      return "Then cook until well browned, then rest—the center should be safely done whether the pork was ground or a whole cut.";
+    }
+    add("wholePork", "groundPork");
+    return "Then cook until browned outside and the center reaches 145°F (63°C), then rest a few minutes (160°F / 71°C if it’s ground).";
+  }
+  if (/\blamb\b/.test(x)) {
+    if (P.groundLamb && !P.wholeLamb) {
+      if (allUsed(["groundLamb"])) {
+        return "Then cook the ground lamb until browned through with no pink in the thickest part.";
+      }
+      add("groundLamb");
+      return "Then cook the ground lamb until browned through with no pink and 160°F (71°C) in the thickest part.";
+    }
+    if (allUsed(["wholeLamb"])) {
+      return "Then cook to your preferred doneness with a short rest—use a thermometer if unsure.";
+    }
+    add("wholeLamb");
+    return "Then cook to your preferred doneness—about 145°F (63°C) for rosy lamb with a short rest, higher if you prefer well done.";
+  }
+  if (/fish|salmon|cod|tuna|shrimp|prawn/.test(x)) {
+    const fishTemp = P.fish && !allUsed(["fish"]);
+    const fishBit = P.fish
+      ? fishTemp
+        ? "opaque and flaky in the center (about 145°F / 63°C for fish)"
+        : "opaque and flaky in the center"
+      : null;
+    const shellBit = P.shellfish ? "pink and firm for shrimp or similar shellfish" : null;
+    if (fishBit && shellBit) {
+      if (fishTemp) add("fish");
+      if (!allUsed(["shellfish"])) add("shellfish");
+      return `Then cook until ${fishBit}, and ${shellBit}.`;
+    }
+    if (fishBit) {
+      if (fishTemp) add("fish");
+      return `Then cook until ${fishBit}.`;
+    }
+    if (shellBit) {
+      if (!allUsed(["shellfish"])) add("shellfish");
+      return `Then cook until ${shellBit}.`;
+    }
+    return "Then cook until the seafood is safely done—opaque and firm as appropriate.";
+  }
+  if (/beef|steak|brisket|ribs?|sirloin|fillet|tenderloin|veal/.test(x)) {
+    if (P.groundBeef && !P.wholeBeef) {
+      if (allUsed(["groundBeef"])) {
+        return "Then brown and cook the ground beef until no pink remains in the thickest part.";
+      }
+      add("groundBeef");
+      return "Then brown and cook the ground beef until no pink remains and it reaches 160°F (71°C) in the thickest part.";
+    }
+    if (P.wholeBeef && !P.groundBeef) {
+      if (allUsed(["wholeBeef"])) {
+        return "Then sear or cook the beef until well browned and the center hits your target doneness after a brief rest.";
+      }
+      add("wholeBeef");
+      return "Then sear or cook the beef until well browned and the center hits your target doneness—about 145°F (63°C) for medium-rare after a brief rest.";
+    }
+    if (P.groundBeef && P.wholeBeef) {
+      if (allUsed(["groundBeef", "wholeBeef"])) {
+        return "Then cook until well browned—the center should be safely done for whole or ground beef.";
+      }
+      add("groundBeef", "wholeBeef");
+      return "Then cook until well browned—about 145°F (63°C) for medium-rare whole beef after resting, or 160°F (71°C) if you’re using ground beef.";
+    }
+    if (allUsed(["groundBeef", "wholeBeef"])) {
+      return "Then sear or cook until well browned and the center reaches the doneness you want.";
+    }
+    add("groundBeef", "wholeBeef");
+    return "Then sear or cook until well browned and the center reaches the doneness you want—about 145°F (63°C) for medium-rare whole cuts after resting, or 160°F (71°C) for ground.";
+  }
+  return meatDoneFallbackLine(P, u);
+};
+
+/**
+ * Steps like "Marinate and cook beef." → marinate timing + cook line aligned with ingredients.
+ */
+const expandMarinateAndCookStep = (stepText, dish, originalIngredients, usedMeatTempKeys = null) => {
+  if (!stepText || typeof stepText !== "string") return null;
+  const t = stepText.trim();
+  const m = t.match(/\bmarinate\s+and\s+cook\s+([^.!?]+)/i);
+  if (!m) return null;
+  let target = m[1].trim().replace(/\s+$/, "");
+  const cutAt = target.search(/\s+over\s+|\s+until\s+|,/i);
+  if (cutAt > 0) target = target.slice(0, cutAt).trim();
+  if (!target) return null;
+  if (!/^the\s+/i.test(target)) target = `the ${target}`;
+
+  const profile = getMeatProfileForInstructions(dish, originalIngredients);
+  if (/^the\s+beef$/i.test(target) && profile.groundBeef && !profile.wholeBeef) target = "the ground beef";
+  if (/^the\s+pork$/i.test(target) && profile.groundPork && !profile.wholePork) target = "the ground pork";
+  if (/^the\s+lamb$/i.test(target) && profile.groundLamb && !profile.wholeLamb) target = "the ground lamb";
+
+  return {
+    main: `Marinate ${target}. ${meatDoneLineForTarget(target, profile, usedMeatTempKeys)}`,
+    timing: "30 min–2 hrs (or overnight)",
+  };
+};
+
+const matchedCookingHints = (stepText) => {
+  if (!stepText || typeof stepText !== "string") return [];
+  const out = [];
+  const seen = new Set();
+  for (const hint of COOKING_TERM_HINTS) {
+    if (!hint.re.test(stepText)) continue;
+    if (seen.has(hint.label)) continue;
+    seen.add(hint.label);
+    out.push(hint);
+  }
+  return out;
+};
+
+/** Heuristic duration for the timing column (ranges collapsed to max via `normalizeHeuristicTiming`). */
+const formatGuidanceParts = (g, stepText, hasExplicitTimingOverride) => {
+  if (!g) return { timing: null };
+  const hasTime = hasExplicitTimingOverride !== undefined ? hasExplicitTimingOverride : stepTextHasExplicitTiming(stepText);
+  const timing = g.duration && !hasTime ? g.duration.replace(/^~\s*/, "").trim() : null;
+  return { timing };
+};
+
+/** Replace “do this; do that” with separate sentences and normalize sentence case. */
+const polishInstructionProse = (s) => {
+  if (!s || typeof s !== "string") return s;
+  let t = s.replace(/;\s+/g, ". ");
+  t = t.replace(/([.!?])\s+([a-z])/g, (_, punct, ch) => `${punct} ${ch.toUpperCase()}`);
+  t = t.replace(/,\s*\./g, ".");
+  t = t.replace(/\s+\./g, ".");
+  return t.replace(/\s{2,}/g, " ").trim();
+};
+
+/** Publisher step + woven hints; optional `timing` for the instructions column layout. */
+const buildInstructionDisplayParts = (stepText, dish, originalIngredients, options = {}) => {
+  const { usedMeatTempKeys = null } = options;
+  if (!stepText || typeof stepText !== "string") return { main: "", timing: null };
+  const rawBase = stepText.trim();
+  if (!rawBase) return { main: "", timing: null };
+
+  const hasTimeFromPublisher = stepTextHasExplicitTiming(rawBase);
+  const explicitTim = extractExplicitTimingPhrase(rawBase);
+  let base = rawBase;
+  if (explicitTim) {
+    const stripped = stripExplicitTimingFromBase(rawBase, explicitTim);
+    if (!instructionBodyLooksBrokenAfterTimingStrip(stripped)) base = stripped;
+  }
+  base = polishInstructionProse(base);
+
+  const profile = getMeatProfileForInstructions(dish, originalIngredients);
+  const attachMeatAppendix = (text, meatBase) => {
+    if (!stepInvolvesCookingMeat(meatBase) || /°F|°\s*C/i.test(text)) return text;
+    if (!stepDescribesMeatDonenessOrFinishedCooking(meatBase)) return text;
+    const ax = usedMeatTempKeys
+      ? meatAppendixForProfileAndUsage(profile, usedMeatTempKeys)
+      : meatSafeTempsAppendixForProfile(profile);
+    return ax ? `${text} ${ax}`.trim() : text;
+  };
+
+  const marinate = expandMarinateAndCookStep(rawBase, dish, originalIngredients, usedMeatTempKeys);
+  if (marinate) {
+    let tim = instructionTimingWorthShowing(rawBase, marinate.timing) ? marinate.timing : null;
+    if (tim) tim = normalizeHeuristicTiming(tim, rawBase);
+    if (!instructionTimingWorthShowing(rawBase, tim)) tim = null;
+    return { main: polishInstructionProse(marinate.main), timing: tim };
+  }
+
+  const hints = matchedCookingHints(base);
+  const g = inferStepGuidance(base);
+  const { timing: timingRaw } = formatGuidanceParts(g, base, hasTimeFromPublisher);
+
+  let timingDisplay = timingRaw ? normalizeHeuristicTiming(timingRaw, base) : null;
+  if (!timingDisplay && explicitTim && instructionTimingWorthShowing(rawBase, explicitTim))
+    timingDisplay = normalizeHeuristicTiming(explicitTim, base);
+  if (!timingDisplay && stepImpliesLongVagueHours(rawBase)) {
+    timingDisplay = normalizeHeuristicTiming(
+      /\bslow\s*cook|crock|\bbrai[sz]e?\b/i.test(rawBase) ? "3–8 hours" : "2–3 hours",
+      rawBase,
+    );
+  }
+  if (!instructionTimingWorthShowing(rawBase, timingDisplay)) timingDisplay = null;
+
+  const extra = [...hints.map((h) => h.woven).filter(Boolean)];
+
+  if (!extra.length) {
+    if (stepInvolvesCookingMeat(base) && !/°F|°\s*C/i.test(base))
+      return {
+        main: polishInstructionProse(attachMeatAppendix(base, base)),
+        timing: timingDisplay,
+      };
+    return { main: polishInstructionProse(base), timing: timingDisplay };
+  }
+
+  let out = base;
+  if (!/[.!?…]$/.test(out)) out += ".";
+  out += " " + extra.join(" ");
+  out = out.replace(/\s{2,}/g, " ").trim();
+  out = attachMeatAppendix(out, base);
+  return { main: polishInstructionProse(out.trim()), timing: timingDisplay };
+};
+
+const computeInstructionRows = (steps, dish, originalIngredients) => {
+  const usedMeatTempKeys = new Set();
+  return (steps || []).map((stepText) => {
+    const parts = buildInstructionDisplayParts(stepText, dish, originalIngredients, {
+      usedMeatTempKeys,
+    });
+    return { main: parts.main, timing: parts.timing };
+  });
+};
+
+const InstructionStepRow = ({ stepText, index, marginBottom = 16, dish, originalIngredients, row }) => {
+  const { main, timing } = row ?? buildInstructionDisplayParts(stepText, dish, originalIngredients);
+  return (
+    <div className="mise-instruction-step" style={{ marginBottom }}>
+      <span className="mise-instruction-step__idx">{String(index + 1).padStart(2, "0")}</span>
+      <p className="mise-instruction-step__body">{main}</p>
+      <div className="mise-instruction-step__timing">
+        {timing ? <span className="mise-instruction-step__timing-value">{timing}</span> : null}
+      </div>
+    </div>
+  );
+};
+
 /**
  * Prep plan for this week: shared component core + merged extras.
  * Extras that do not apply to every week recipe using that component get `_onlyForRecipes`.
@@ -149,16 +1007,18 @@ const buildPrepPlan = (weekDishIds, dishes) => {
   const compUsage = {};
   weekDishes.forEach((d) => {
     (d.groups || []).filter((g) => g.type === "component").forEach((g) => {
-      if (!compUsage[g.componentId]) compUsage[g.componentId] = { usedInSet: new Set(), pairs: [] };
+      if (!compUsage[g.componentId]) compUsage[g.componentId] = { usedInSet: new Set(), pairs: [], labels: new Set() };
       compUsage[g.componentId].usedInSet.add(d.title);
+      if (g.label && String(g.label).trim()) compUsage[g.componentId].labels.add(String(g.label).trim());
       for (const ing of g.extras || []) compUsage[g.componentId].pairs.push({ dish: d.title, ing });
     });
   });
   return Object.entries(compUsage)
-    .map(([cid, { usedInSet, pairs }]) => {
+    .map(([cid, { usedInSet, pairs, labels }]) => {
       const lib = COMPONENT_LIBRARY[cid];
       if (!lib) return null;
       const usedIn = [...usedInSet].sort();
+      const groupLabels = [...labels].sort();
       const nUsers = usedIn.length;
       const extraByNorm = {};
       for (const { dish, ing } of pairs) {
@@ -179,7 +1039,11 @@ const buildPrepPlan = (weekDishIds, dishes) => {
           ...(recipeList.length < nUsers ? { _onlyForRecipes: recipeList } : {}),
         };
       });
-      return { ...lib, usedIn, ingredients: [...(lib.ingredients || []), ...mergedExtras] };
+      const scaledCore = (lib.ingredients || []).map((ing) => ({
+        ...ing,
+        amount: sumAmountNTimes(ing.amount, nUsers),
+      }));
+      return { ...lib, usedIn, groupLabels, ingredients: [...scaledCore, ...mergedExtras] };
     })
     .filter(Boolean)
     .sort((a, b) => b.cookTime - a.cookTime);
@@ -187,7 +1051,6 @@ const buildPrepPlan = (weekDishIds, dishes) => {
 
 const buildShoppingList = (weekDishIds, dishes) => {
   const weekDishes = dishes.filter(d=>weekDishIds.includes(d.id));
-  const seenCompIds = new Set();
   const merged = {}; // normalised name → {item, amount, _type}
 
   const addItem = (ing, type) => {
@@ -206,8 +1069,7 @@ const buildShoppingList = (weekDishIds, dishes) => {
     (d.groups||[]).forEach(g=>{
       if(g.type==="component") {
         const comp = COMPONENT_LIBRARY[g.componentId];
-        if(comp&&!seenCompIds.has(g.componentId)) {
-          seenCompIds.add(g.componentId);
+        if(comp) {
           comp.ingredients.forEach(ing=>addItem(ing,"base"));
         }
         (g.extras||[]).forEach(ing=>addItem(ing,"dish"));
@@ -242,8 +1104,8 @@ const findSharedIngredients = (weekDishIds, dishes) => {
 };
 
 // ─── Shared UI atoms ──────────────────────────────────────────────────────────
-const Ck = ({checked,onClick,size=18}) => (
-  <div onClick={onClick} style={{width:size,height:size,flexShrink:0,marginTop:2,borderRadius:4,border:`1.5px solid ${checked?T.text:T.border}`,background:checked?T.text:"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s ease",cursor:"pointer"}}>
+const Ck = ({checked,onClick,size=18,marginTop=2,style}) => (
+  <div onClick={onClick} style={{width:size,height:size,flexShrink:0,marginTop,borderRadius:4,border:`1.5px solid ${checked?T.text:T.border}`,background:checked?T.text:"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s ease",cursor:"pointer",...style}}>
     {checked&&<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke={T.surface} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
   </div>
 );
@@ -362,7 +1224,7 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
               {mode&&<button onClick={()=>setMode(null)} style={{width:36,height:36,borderRadius:"50%",background:"rgba(255,255,255,0.85)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px rgba(0,0,0,0.12)"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>}
               {!mode&&<div style={{fontSize:16,fontWeight:600,color:T.text,fontFamily:T.font}}>Add dish</div>}
             </div>
-            <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",fontSize:20,color:T.muted,padding:0,lineHeight:1}}>×</button>
+            <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,color:T.muted,padding:0,lineHeight:1}}>×</button>
           </div>
         </div>
 
@@ -466,7 +1328,7 @@ const ImportSheet = ({onClose, onAdd, activeDishes}) => {
           {/* URL result */}
           {mode==="url"&&result&&(
             <div>
-              <div style={{fontSize:20,fontWeight:600,color:T.text,marginBottom:4,fontFamily:T.fontTitle}}>{result.title}</div>
+              <div style={{fontSize:16,fontWeight:600,color:T.text,marginBottom:4,fontFamily:T.fontTitle}}>{result.title}</div>
               <div style={{fontSize:12,color:T.muted,marginBottom:14,fontFamily:T.font}}>{result.cuisine} · {result.cookTime} min active</div>
               {(result.groups||[]).map((g,i)=>(
                 <div key={i} style={{marginBottom:10}}>
@@ -560,7 +1422,7 @@ const DishRow = ({dish, inWeek, onToggleWeek, onClick}) => {
         <div className="mise-dish-blob mise-dish-blob-b" style={{position:"absolute",width:60,height:60,borderRadius:"50%",background:c2,filter:"blur(14px)",top:p2y-10,left:p2x-10,opacity:0.75}}/>
         <div className="mise-dish-blob mise-dish-blob-c" style={{position:"absolute",width:50,height:50,borderRadius:"50%",background:c3,filter:"blur(12px)",top:p3y-5,left:p3x-5,opacity:0.65}}/>
         {imgSrc&&(
-          <img src={imgSrc} alt="" decoding="async" referrerPolicy="no-referrer" className="mise-dish-img" onError={e=>{e.currentTarget.style.display="none";}}/>
+          <img src={imgSrc} alt="" decoding="async" className="mise-dish-img" onError={e=>{e.currentTarget.style.display="none";}}/>
         )}
       </div>
       <div className="mise-dish-footer">
@@ -617,25 +1479,25 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
       boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
     };
     return (
-      <div className="mise-detail-hero-visual-inner" style={{position:"relative",aspectRatio:"3/2",overflow:"hidden",background:c3}}>
+      <div className="mise-detail-hero-visual-inner" style={{position:"relative",overflow:"hidden",background:c3}}>
         <div className="mise-detail-hero-parallax" style={{position:"absolute",inset:0,transform:`translateY(${scrollY*0.4}px)`,willChange:"transform"}}>
           <div style={{position:"absolute",width:320,height:320,borderRadius:"50%",background:c1,filter:"blur(80px)",top:-80,left:-60,opacity:0.9}}/>
           <div style={{position:"absolute",width:280,height:280,borderRadius:"50%",background:c2,filter:"blur(64px)",top:60,right:-60,opacity:0.8}}/>
           <div style={{position:"absolute",width:240,height:240,borderRadius:"50%",background:c3,filter:"blur(56px)",bottom:-80,left:"20%",opacity:0.7}}/>
-          {heroSrc&&<img src={heroSrc} alt="" aria-label={dish.title} referrerPolicy="no-referrer" decoding="async" style={{position:"absolute",inset:0,zIndex:1,width:"100%",height:"100%",maxWidth:"none",objectFit:"cover",display:"block"}} onError={e=>{e.currentTarget.style.display="none";}}/>}
+          {heroSrc&&<img src={heroSrc} alt="" aria-label={dish.title} decoding="async" style={{position:"absolute",inset:0,zIndex:1,width:"100%",height:"100%",maxWidth:"none",objectFit:"cover",display:"block"}} onError={e=>{e.currentTarget.style.display="none";}}/>}
         </div>
-        <div className="mise-detail-hero-toolbar" style={{position:"absolute",top:0,left:0,right:0,zIndex:3,display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"flex-end",gap:8,padding:16,pointerEvents:"none"}}>
+        <div className="mise-detail-hero-toolbar" style={{position:"absolute",top:0,left:0,right:0,zIndex:3,flexWrap:"wrap",alignItems:"center",justifyContent:"flex-end",gap:8,padding:16,pointerEvents:"none"}}>
           <button
             type="button"
             onClick={()=>{if(!inWeek&&onShowToast)onShowToast(dish);onToggleWeek(dish.id);}}
             className="mise-detail-hero-toolbar-week"
             style={{
               pointerEvents:"all",
-              background:inWeek?"rgba(0,51,160,0.92)":"rgba(255,255,255,0.92)",
+              background:inWeek?T.text:"rgba(255,255,255,0.92)",
               color:inWeek?"#fff":T.text,
               backdropFilter:"blur(12px)",
               WebkitBackdropFilter:"blur(12px)",
-              border:"none",
+              border:`1.5px solid ${T.text}`,
               borderRadius:100,
               padding:"0 16px",
               height:36,
@@ -665,15 +1527,17 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
 
       {/* Cook this week — fixed top-right on narrow viewports only */}
       <div className="mise-detail-week-pill-wrap" style={{position:"fixed",top:0,right:0,zIndex:120,pointerEvents:"none",padding:"16px 16px 0 0"}}>
-        <button onClick={()=>{if(!inWeek&&onShowToast)onShowToast(dish);onToggleWeek(dish.id);}} style={{pointerEvents:"all",background:inWeek?"rgba(0,51,160,0.9)":"rgba(255,255,255,0.85)",color:inWeek?"#fff":T.text,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:"none",borderRadius:100,padding:"0 16px",height:36,cursor:"pointer",fontSize:12,fontFamily:T.font,fontWeight:600,boxShadow:"0 2px 8px rgba(0,0,0,0.12)",transition:"all 0.2s ease"}}>
+        <button onClick={()=>{if(!inWeek&&onShowToast)onShowToast(dish);onToggleWeek(dish.id);}} style={{pointerEvents:"all",background:inWeek?T.text:"rgba(255,255,255,0.85)",color:inWeek?"#fff":T.text,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:`1.5px solid ${T.text}`,borderRadius:100,padding:"0 16px",height:36,cursor:"pointer",fontSize:12,fontFamily:T.font,fontWeight:600,boxShadow:"0 2px 8px rgba(0,0,0,0.12)",transition:"all 0.2s ease"}}>
           {inWeek?"✓ This week":"Cook this week"}
         </button>
       </div>
 
-      <div className="mise-detail-hero">
+      <div className="mise-detail-hero-banner">
         <div className="mise-detail-hero-visual">
           {heroBlock}
         </div>
+      </div>
+      <div className="mise-detail-body-cols">
         <div className="mise-detail-hero-copy" style={{padding:"16px 16px 16px 0",boxSizing:"border-box"}}>
           <div style={{fontSize:11,letterSpacing:"0.08em",textTransform:"uppercase",color:T.text,fontFamily:T.font,marginBottom:6,fontWeight:400}}>
             {dish.original?.ingredients?.length>0?"Adapted recipe":"Original recipe"}
@@ -689,11 +1553,6 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
               </button>
             </div>
           </div>
-          <div style={{fontSize:12,color:T.muted,display:"flex",flexWrap:"wrap",gap:16,marginBottom:8}}>
-            <span>{dish.cuisine}</span>
-            <span style={{display:"flex",alignItems:"center",gap:4}}><ClockIcon/>{dish.cookTime} min</span>
-            <span>{dish.servings} servings</span>
-          </div>
           {dish.sourceUrl&&(
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <div style={{width:24,height:24,borderRadius:"50%",background:T.border,flexShrink:0,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -704,12 +1563,16 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
               <span style={{fontSize:12,color:T.muted,fontFamily:T.font}}>{sourceName(dish.sourceUrl)||dish.sourceTitle}</span>
             </div>
           )}
+          <div style={{fontSize:12,color:T.muted,display:"flex",flexWrap:"wrap",gap:16,marginBottom:8}}>
+            <span style={{display:"flex",alignItems:"center",gap:4}}><ClockIcon/>{dish.cookTime} min</span>
+            <span>{dish.servings} servings</span>
+          </div>
         </div>
-      </div>
+        <div className="mise-detail-main-col">
       {/* Tab bar — matching week page style */}
       <div className="mise-detail-tabbar" style={{position:"sticky",top:0,zIndex:10,background:"#fff",borderBottom:`1px solid ${T.border}`,padding:"0 16px 0 0",display:"flex",gap:8}}>
         {[{id:"ingredients",label:"Ingredients"},{id:"instructions",label:"Instructions"}].map(t=>(
-          <button key={t.id} onClick={()=>setView(t.id)} style={{flex:1,padding:"14px 0",background:"none",border:"none",borderBottom:`2px solid ${view===t.id?T.accent:"transparent"}`,color:view===t.id?T.accent:T.muted,fontSize:12,fontFamily:T.font,fontWeight:view===t.id?600:400,cursor:"pointer",transition:"color 0.2s ease",textAlign:"left"}}>{t.label}</button>
+          <button key={t.id} onClick={()=>setView(t.id)} style={{flex:1,minHeight:64,display:"flex",alignItems:"center",boxSizing:"border-box",padding:0,background:"none",border:"none",borderBottom:`2px solid ${view===t.id?T.accent:"transparent"}`,color:view===t.id?T.accent:T.muted,fontSize:12,fontFamily:T.font,fontWeight:view===t.id?600:400,cursor:"pointer",transition:"color 0.2s ease",textAlign:"left"}}>{t.label}</button>
         ))}
       </div>
 
@@ -721,10 +1584,19 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
             const gChecked=!!checked[gk];
             const comp = group.type==="component" ? COMPONENT_LIBRARY[group.componentId] : null;
             const isShared = comp && inWeek && activeCompIds.has(group.componentId);
-            const heading = group.label || comp?.name || "Ingredients";
+            const groupTitle =
+              group.type === "component"
+                ? (group.label || "").trim() || comp?.name || "Ingredients"
+                : group.label || "Ingredients";
+            const composedBase =
+              group.type === "component" &&
+              comp?.name &&
+              group.label &&
+              normIngName(group.label) !== normIngName(comp.name);
             const compIngs = comp?.ingredients||[];
             const extraIngs = group.extras||[];
             const dishIngs = group.ingredients||[];
+            const baseIngPad = composedBase ? 12 : 0;
 
             return (
               <div key={gi} style={{marginBottom:8}}>
@@ -732,11 +1604,14 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
                 <div onClick={()=>ck(gk)} style={{display:"flex",alignItems:"flex-start",gap:16,padding:"12px 0",borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}>
                   <Ck checked={gChecked} onClick={()=>ck(gk)}/>
                   <div style={{flex:1}}>
-                    <div style={{display:"flex",alignItems:"center",gap:8}}>
-                      <span style={{fontSize:14,fontWeight:600,color:gChecked?T.faint:T.text,textDecoration:gChecked?"line-through":"none",fontFamily:T.font}}>{heading}</span>
+                    <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                      <span style={{fontSize:14,fontWeight:600,color:gChecked?T.faint:T.text,textDecoration:gChecked?"line-through":"none",fontFamily:T.font}}>{groupTitle}</span>
                       {isShared&&<span style={{fontSize:11,color:T.surface,background:T.muted,borderRadius:4,padding:"2px 8px",letterSpacing:"0.04em",textTransform:"uppercase",fontFamily:T.font}}>prepped</span>}
                     </div>
-                    {group.note&&<div style={{fontSize:12,color:T.muted,marginTop:0,fontFamily:T.font}}>{group.note}</div>}
+                    {composedBase&&(
+                      <div style={{fontSize:12,color:T.muted,fontFamily:T.font,marginTop:4,fontWeight:500}}>{comp.name}</div>
+                    )}
+                    {group.note&&<div style={{fontSize:12,color:T.muted,marginTop:4,fontFamily:T.font}}>{group.note}</div>}
                   </div>
                 </div>
 
@@ -744,6 +1619,7 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
                 <div style={{paddingLeft:40}}>
                   {group.type==="component"&&(
                     <>
+                      <div style={{paddingLeft:baseIngPad}}>
                       {compIngs.map((ing,ii)=>{
                         const k=gk+"c"+ii; const kChecked=!!checked[k];
                         return(
@@ -754,16 +1630,22 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
                           </div>
                         );
                       })}
-                      {extraIngs.map((ing,ii)=>{
-                        const k=gk+"e"+ii; const kChecked=!!checked[k];
-                        return(
-                          <div key={ii} onClick={()=>ck(k)} style={{display:"flex",alignItems:"flex-start",gap:16,padding:"8px 0",minHeight:40,borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}>
-                            <Ck checked={kChecked} onClick={()=>ck(k)}/>
-                            <span style={{flex:1,fontSize:14,color:kChecked?T.faint:T.text,textDecoration:kChecked?"line-through":"none",fontFamily:T.font}}>{ing.item}{ing.note?<span style={{color:T.text,fontSize:12}}> — {ing.note}</span>:""}</span>
-                            <span style={{fontSize:12,color:T.muted,fontFamily:T.font,flexShrink:0}}>{ing.amount}</span>
-                          </div>
-                        );
-                      })}
+                      </div>
+                      {extraIngs.length>0&&(
+                        <>
+                          <div style={{fontSize:11,color:T.muted,fontFamily:T.font,letterSpacing:"0.04em",textTransform:"uppercase",padding:"10px 0 4px",borderBottom:`1px solid ${T.border}`}}>Also for this recipe</div>
+                          {extraIngs.map((ing,ii)=>{
+                            const k=gk+"e"+ii; const kChecked=!!checked[k];
+                            return(
+                              <div key={ii} onClick={()=>ck(k)} style={{display:"flex",alignItems:"flex-start",gap:16,padding:"8px 0",minHeight:40,borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}>
+                                <Ck checked={kChecked} onClick={()=>ck(k)}/>
+                                <span style={{flex:1,fontSize:14,color:kChecked?T.faint:T.text,textDecoration:kChecked?"line-through":"none",fontFamily:T.font}}>{ing.item}{ing.note?<span style={{color:T.text,fontSize:12}}> — {ing.note}</span>:""}</span>
+                                <span style={{fontSize:12,color:T.muted,fontFamily:T.font,flexShrink:0}}>{ing.amount}</span>
+                              </div>
+                            );
+                          })}
+                        </>
+                      )}
                     </>
                   )}
                   {group.type==="dish"&&dishIngs.map((ing,ii)=>{
@@ -793,11 +1675,8 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
             return (
               <div key={gi} style={{marginBottom:28}}>
                 <div style={{fontSize:12,fontWeight:600,color:T.text,fontFamily:T.font,marginBottom:10}}>{comp.name}</div>
-                {comp.instructions.map((step,i)=>(
-                  <div key={i} style={{display:"flex",gap:16,marginBottom:16}}>
-                    <span style={{fontSize:12,color:T.muted,fontWeight:600,width:18,flexShrink:0,paddingTop:2,textAlign:"center"}}>{String(i+1).padStart(2,"0")}</span>
-                    <p style={{fontSize:14,color:T.text,lineHeight:1.7,margin:0,flex:1}}>{step}</p>
-                  </div>
+                {computeInstructionRows(comp.instructions, dish, null).map((row, i) => (
+                  <InstructionStepRow key={i} row={row} index={i} marginBottom={16} />
                 ))}
               </div>
             );
@@ -806,11 +1685,8 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
           {(dish.groups||[]).some(g=>g.type==="component"&&COMPONENT_LIBRARY[g.componentId]?.instructions?.length)&&dish.steps?.length>0&&(
             <div style={{fontSize:12,fontWeight:600,color:T.text,fontFamily:T.font,marginBottom:10}}>Finishing the dish</div>
           )}
-          {(dish.steps||[]).map((step,i)=>(
-            <div key={i} style={{display:"flex",gap:16,marginBottom:20}}>
-              <span style={{fontSize:12,color:T.muted,fontWeight:600,width:18,flexShrink:0,paddingTop:2,textAlign:"center"}}>{String(i+1).padStart(2,"0")}</span>
-              <p style={{fontSize:14,color:T.text,lineHeight:1.7,margin:0,flex:1}}>{step}</p>
-            </div>
+          {computeInstructionRows(dish.steps, dish, null).map((row, i) => (
+            <InstructionStepRow key={i} row={row} index={i} marginBottom={20} />
           ))}
         </div>
       )}
@@ -818,7 +1694,7 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
       {/* ── Original view ── */}
 
       {/* Notes */}
-      <div className="mise-detail-notes" style={{padding:"28px 16px 80px 0"}}>
+      <div className="mise-detail-notes" style={{padding:"28px 16px 0 0"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
           <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.muted,fontWeight:600}}>Notes</div>
           <div style={{display:"flex",gap:8}}>
@@ -838,7 +1714,7 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
           const dishTags = TAGS.filter(t=>t.match(dish));
           if(!dishTags.length) return null;
           return (
-            <div style={{marginTop:20}}>
+            <div className="mise-detail-tags" style={{marginTop:28}}>
               <div style={{fontSize:11,letterSpacing:"0.08em",textTransform:"uppercase",color:T.muted,fontWeight:600,marginBottom:8}}>Tags</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
                 {dishTags.map(t=>(
@@ -848,7 +1724,8 @@ const DishDetail = ({dish, inWeek, onBack, onToggleWeek, weekDishIds, allDishes,
             </div>
           );
         })()}
-
+        </div>
+      </div>
 
     </div>
   );
@@ -868,7 +1745,7 @@ const TAGS = [
   {label:"Italian", match: d => /italian/i.test(d.cuisine)},
   {label:"Asian", match: d => /chinese|japanese|korean|thai|vietnamese|singaporean|cantonese|sichuan|indonesian/i.test(d.cuisine)},
   {label:"Indian", match: d => /indian/i.test(d.cuisine)},
-  {label:"Middle Eastern", match: d => /middle eastern|lebanese|persian|turkish/i.test(d.cuisine)},
+  {label:"West Asian", match: d => /middle eastern|west asian|lebanese|persian|turkish/i.test(d.cuisine)},
   {label:"Mexican", match: d => /mexican/i.test(d.cuisine)},
   {label:"American", match: d => /american/i.test(d.cuisine)},
 ];
@@ -930,8 +1807,8 @@ const RecipesTab = ({weekDishIds, onToggleWeek, onViewDish, dishes, initialTag, 
   return (
     <div className="mise-recipes-tab" style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column"}} onScroll={onScroll} onClick={(e)=>{if(e.target!==inputRef.current&&inputRef.current)inputRef.current.blur();}}>
       {/* Sticky search + sort button */}
-      <div className="mise-recipes-sticky" style={{position:"sticky",top:0,zIndex:10,background:T.surface,transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)",transform:shown?"translateY(0)":"translateY(-110%)",padding:"12px 16px 12px 0"}}>
-        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+      <div className="mise-recipes-sticky" style={{position:"sticky",top:0,zIndex:10,background:T.surface,transition:"transform 0.28s cubic-bezier(0.4,0,0.2,1)",transform:shown?"translateY(0)":"translateY(-110%)"}}>
+        <div className="mise-recipes-sticky-row">
           <div style={{position:"relative",flex:1}}>
             <svg style={{position:"absolute",left:11,top:"50%",transform:"translateY(-50%)",color:T.text}} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input ref={inputRef} value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search dishes…" onFocus={()=>setSearchFocused(true)} onBlur={()=>setTimeout(()=>setSearchFocused(false),150)} style={{width:"100%",border:`1px solid ${T.border}`,borderRadius:100,padding:"0 32px 0 32px",fontSize:16,fontFamily:T.font,color:T.text,background:"#fff",outline:"none",height:36,boxSizing:"border-box"}}/>
@@ -1013,14 +1890,23 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
       })
       .filter(({score})=>score>0)
       .sort((a,b)=>b.score-a.score);
-    // Enforce cuisine variety — at most 2 of same cuisine in suggestions
+    // Enforce cuisine variety — at most 2 of same cuisine, then fill to 12
     const seen = {}; const result = [];
     for(const item of scored) {
       const c = item.d.cuisine;
       if((seen[c]||0) >= 2) continue;
       seen[c] = (seen[c]||0) + 1;
       result.push(item);
-      if(result.length >= 6) break;
+      if(result.length >= 12) break;
+    }
+    if(result.length < 12) {
+      const have = new Set(result.map(r=>r.d.id));
+      for(const item of scored) {
+        if(have.has(item.d.id)) continue;
+        result.push(item);
+        have.add(item.d.id);
+        if(result.length >= 12) break;
+      }
     }
     return result;
   })() : [];
@@ -1058,35 +1944,155 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
       const cuisinePenalty = uniqueCuisines === 1 ? 8 : uniqueCuisines === 2 ? 2 : 0;
       return commonComps * 5 + pairCompOverlap * 2 + Math.min(ingOverlap, 4) + uniqueCuisines * 3 - cuisinePenalty;
     };
-    // Theme names based on dominant shared component
+    const usedRecTitles = new Set();
+    // Short editorial titles (max 5 words); shared prep / cuisine / overlap only — no recipe names
     const themeFor = (trio) => {
-      const counts = {};
-      trio.forEach(d=>[...getCompIds(d)].forEach(id=>{counts[id]=(counts[id]||0)+1;}));
-      const top = Object.entries(counts).sort(([,a],[,b])=>b-a)[0]?.[0];
-      const cuisines = [...new Set(trio.map(d=>d.cuisine))];
-      const themesByCuisine = {
-        "Italian":"La Cucina","Italian-American":"Sunday Gravy","French":"Bistro Night",
-        "Japanese":"Tokyo Table","Chinese":"Wok Night","Cantonese":"Dim Sum Energy",
-        "Sichuan":"Fire and Numbing","Korean":"Banchan Week","Thai":"Bangkok Kitchen",
-        "Indian":"Curry Night","Vietnamese":"Pho Real","Middle Eastern":"The Mezze",
-        "Mediterranean":"Sun-Drenched","American":"Back Pocket Classics",
+      const seedKey = trio
+        .map((d) => d.id || "")
+        .sort()
+        .join("\0");
+      let seed = 0;
+      for (let i = 0; i < seedKey.length; i++) seed = (Math.imul(seed, 31) + seedKey.charCodeAt(i)) | 0;
+      const ix = (salt, len) => (len ? ((seed + salt) >>> 0) % len : 0);
+      const maxWords = 5;
+      const clip = (s) => {
+        const w = String(s).trim().split(/\s+/).filter(Boolean);
+        return w.slice(0, maxWords).join(" ");
       };
-      if(cuisines.length===1&&themesByCuisine[cuisines[0]]) return themesByCuisine[cuisines[0]];
-      const themes = {
-        "aromatic-base":"Built from the Base",
-        "tomato-base":"Everything Tomato",
-        "soy-ginger-base":"The Umami Thread",
-        "chili-oil":"For the Heat Lovers",
-        "herb-garlic-oil":"Olive Oil and Patience",
-        "miso-glaze":"Deep and Savory",
-        "citrus-acid":"Acidic and Alive",
-        "tahini-sauce":"The Tahini Arc",
-        "soffritto":"Low and Slow Sunday",
-        "coconut-curry-base":"Creamy and Bright",
-        "warm-spice-blend":"Warming the Kitchen",
-        "caramelized-onions":"Worth the Wait",
+      const take = (rawOptions) => {
+        const opts = [...rawOptions].map(clip).filter(Boolean);
+        if (!opts.length) return clip("More to cook");
+        for (let salt = 0; salt < opts.length * 6 + 12; salt++) {
+          const t = opts[ix(salt, opts.length)];
+          if (!usedRecTitles.has(t)) {
+            usedRecTitles.add(t);
+            return t;
+          }
+        }
+        let k = 1;
+        let t = clip(`${opts[0]} ${k}`);
+        while (usedRecTitles.has(t) && k < 50) {
+          k++;
+          t = clip(`${opts[ix(k, opts.length)]} ${k}`);
+        }
+        usedRecTitles.add(t);
+        return t;
       };
-      return themes[top] || "A Week Worth Cooking";
+
+      const compSets = trio.map(getCompIds);
+      const inAllThree = [...compSets[0]].filter((id) => compSets[1].has(id) && compSets[2].has(id));
+      const compVote = {};
+      trio.forEach((d) => [...getCompIds(d)].forEach((id) => { compVote[id] = (compVote[id] || 0) + 1; }));
+      const topCompId = Object.entries(compVote).sort((a, b) => b[1] - a[1])[0]?.[0];
+
+      const compShort = (id) => {
+        const n = COMPONENT_LIBRARY[id]?.name || "";
+        return n.replace(/\s+base$/i, "").replace(/\s+blend$/i, "").trim() || "prep";
+      };
+
+      const compLabels = {
+        "aromatic-base": ["Low hum of alliums", "Sofrito at the core", "Garlic-ginger depth"],
+        "tomato-base": ["Red sauce gravity", "Tomato sunset mood", "Summer tomato savor"],
+        "soy-ginger-base": ["East Asian umami", "Soy-ginger wavelength", "Salty-sweet savory lane"],
+        "chili-oil": ["Slow burn energy", "Chili oil swagger", "Heat that lingers"],
+        "herb-garlic-oil": ["Green garlic glow", "Herb oil dusk", "Garden savor finish"],
+        "miso-glaze": ["Deep miso savor", "Fermented savory edge", "Brown miso depth"],
+        "citrus-acid": ["Bright acid lift", "Lemon-lime high notes", "Sharp citrus finish"],
+        "tahini-sauce": ["Sesame cream tang", "Nutty tahini sway", "Creamy sesame mood"],
+        "soffritto": ["Sunday sofrito slow", "Italian holy trinity", "Soft golden veg"],
+        "coconut-curry-base": ["Coconut curry haze", "Creamy spice island", "Gentle curry glow"],
+        "warm-spice-blend": ["Toasted spice warmth", "Cozy spice bloom", "Baking spice dusk"],
+        "caramelized-onions": ["Deep onion sweetness", "Amber onion slow", "Low caramel savor"],
+      };
+
+      const cuisines = [...new Set(trio.map((d) => d.cuisine).filter(Boolean))];
+      const cuisineOptions = () => {
+        if (cuisines.length === 1) {
+          const c = cuisines[0];
+          const byC = {
+            Italian: ["Tuscan table gravity", "Parmesan dusk mood", "Slow Sunday Italian"],
+            "Italian-American": ["Sunday gravy energy", "Red checkered mood", "Sunday sauce orbit"],
+            French: ["Butter and bistro dusk", "Parisian comfort haze", "French technique ease"],
+            Japanese: ["Tokyo pantry calm", "Clean umami lines", "Japanese precision ease"],
+            Chinese: ["Wok breath energy", "High heat Chinese", "Chinese savor orbit"],
+            Cantonese: ["Dim sum daylight", "Cantonese comfort haze", "Southern Chinese ease"],
+            Sichuan: ["Mala slow burn", "Numbing heat wave", "Sichuan pepper dusk"],
+            Korean: ["Gochujang glow", "Korean banchan mood", "Seoul savory edge"],
+            Thai: ["Thai sweet heat", "Fish sauce daylight", "Bangkok balance beam"],
+            Indian: ["Masala bloom energy", "Warm spice Indian", "Curry leaf dusk"],
+            Vietnamese: ["Herb and fish sauce", "Viet bright savor", "Saigon fresh edge"],
+            "Middle Eastern": ["Levantine herb oil", "Tahini tang dusk", "Eastern Med savor"],
+            Mediterranean: ["Olive oil coast", "Sun soaked Med", "Mediterranean blue hour"],
+            American: ["Back pocket classics", "Stateside comfort", "American porch cooking"],
+          };
+          return byC[c] || [`${c} flavor orbit`, `${c} kitchen dusk`, `${c} savor mood`];
+        }
+        if (cuisines.length === 2) {
+          const [a, b] = [...cuisines].sort();
+          return [
+            `${a} meets ${b}`,
+            `${a} ${b} crossover`,
+            `Passport ${a} ${b}`,
+          ];
+        }
+        return [
+          "Three kitchen time zones",
+          "Global flavor compass",
+          "Around the world fast",
+        ];
+      };
+
+      const ingFreq = {};
+      trio.forEach((d) => getDishIngs(d).forEach((i) => { ingFreq[i] = (ingFreq[i] || 0) + 1; }));
+      const dull = new Set(["salt", "water", "sugar", "pepper", "black pepper", "oil", "olive oil"]);
+      const bridge = Object.entries(ingFreq)
+        .filter(([, n]) => n >= 2)
+        .map(([w]) => w)
+        .filter((w) => !dull.has(w))
+        .slice(0, 2);
+
+      const ingToken = (raw) => clip(raw.split(/\s+/).slice(0, 2).join(" "));
+
+      if (inAllThree.length) {
+        const id = inAllThree[ix(0, inAllThree.length)];
+        const s = compShort(id);
+        const pool = compLabels[id] || [
+          `Same ${s} wavelength`,
+          `${s} flavor spine`,
+          `${s} kitchen gravity`,
+        ];
+        return take(pool);
+      }
+
+      if (topCompId && compVote[topCompId] >= 2) {
+        const s = compShort(topCompId);
+        const pool = compLabels[topCompId] || [
+          `Mostly ${s} orbit`,
+          `${s} savor spine`,
+          `Leaning ${s} heavy`,
+        ];
+        return take(pool);
+      }
+
+      if (bridge.length >= 2) {
+        const a = ingToken(bridge[0]);
+        const b = ingToken(bridge[1]);
+        return take([
+          `${a} ${b} kinship`,
+          `${a} and ${b} thread`,
+          `Both crave ${a}`,
+        ]);
+      }
+      if (bridge.length === 1) {
+        const w = ingToken(bridge[0]);
+        return take([
+          `${w} in the air`,
+          `All about ${w}`,
+          `${w} flavor echo`,
+        ]);
+      }
+
+      return take(cuisineOptions());
     };
 
     // Shuffle available dishes to randomize groups each render
@@ -1126,7 +2132,7 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
     <div ref={scrollRef} className="mise-week-tab" style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",background:"#fff"}}>
       <div className="mise-week-subtabs" style={{position:"sticky",top:0,zIndex:10,background:"#fff",borderBottom:`1px solid ${T.border}`,padding:"0 16px 0 0",display:"flex",flexShrink:0,gap:8}}>
         {[{id:"dishes",label:"Recipes"},{id:"prep",label:"Mise en place"},{id:"shopping",label:"Shopping list"}].map(t=>(
-          <button key={t.id} onClick={()=>{setSubTab(t.id);if(scrollRef.current)scrollRef.current.scrollTop=0;}} style={{flex:1,padding:"14px 0",background:"none",border:"none",borderBottom:`2px solid ${subTab===t.id?T.accent:"transparent"}`,color:subTab===t.id?T.accent:T.muted,fontSize:12,fontFamily:T.font,fontWeight:subTab===t.id?600:400,cursor:"pointer",transition:"color 0.2s ease",textAlign:"left"}}>{t.label}</button>
+          <button key={t.id} onClick={()=>{setSubTab(t.id);if(scrollRef.current)scrollRef.current.scrollTop=0;}} style={{flex:1,minHeight:64,display:"flex",alignItems:"center",boxSizing:"border-box",padding:0,background:"none",border:"none",borderBottom:`2px solid ${subTab===t.id?T.accent:"transparent"}`,color:subTab===t.id?T.accent:T.muted,fontSize:12,fontFamily:T.font,fontWeight:subTab===t.id?600:400,cursor:"pointer",transition:"color 0.2s ease",textAlign:"left"}}>{t.label}</button>
         ))}
       </div>
 
@@ -1145,37 +2151,37 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
               <div style={{position:"absolute",width:200,height:200,borderRadius:"50%",background:"rgba(255,100,80,0.4)",filter:"blur(48px)",top:20,right:-30,animation:"blob2 9s ease-in-out infinite"}}/>
               <div style={{position:"absolute",width:180,height:180,borderRadius:"50%",background:"rgba(255,160,200,0.5)",filter:"blur(40px)",bottom:-40,left:"30%",animation:"blob3 8s ease-in-out infinite"}}/>
               <div style={{position:"relative",zIndex:2,textAlign:"left",padding:"40px 16px 40px 0"}}>
-                <div style={{fontSize:20,fontWeight:600,color:"rgba(60,30,10,0.75)",lineHeight:1.4,fontFamily:T.font}}>Pick a recipe to get started.</div>
+                <div style={{fontSize:16,fontWeight:600,color:"rgba(60,30,10,0.75)",lineHeight:1.4,fontFamily:T.font}}>Pick a recipe to get started.</div>
               </div>
             </div>
           )}
           {/* Selected recipes */}
-          {weekDishes.map(d=><DishRow key={d.id} dish={d} inWeek={true} onToggleWeek={id=>setWeekDishIds(ids=>ids.filter(i=>i!==id))} onClick={()=>onViewDish(d)}/>)}
+          <div className="mise-recipe-grid">
+            {weekDishes.map(d=><DishRow key={d.id} dish={d} inWeek={true} onToggleWeek={id=>setWeekDishIds(ids=>ids.filter(i=>i!==id))} onClick={()=>onViewDish(d)}/>)}
+          </div>
           {/* Suggestions */}
           {weekDishes.length>0&&suggestions.length>0&&(
             <div>
               <div className="mise-week-hr-top" style={{padding:"16px 16px 8px 0",borderTop:`1px solid ${T.border}`}}>
-                <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.text,fontWeight:600,fontFamily:T.font}}>Shared bases and ingredients</div>
+                <div style={{fontSize:16,fontWeight:600,color:T.text,fontFamily:T.fontTitle}}>Suggested recipes for the week</div>
               </div>
-              {suggestions.map(({d})=>(
-                <DishRow key={d.id} dish={d} inWeek={false} onToggleWeek={id=>setWeekDishIds(ids=>[...ids,id])} onClick={()=>onViewDish(d)}/>
-              ))}
+              <div className="mise-recipe-grid">
+                {suggestions.map(({d})=>(
+                  <DishRow key={d.id} dish={d} inWeek={false} onToggleWeek={id=>setWeekDishIds(ids=>[...ids,id])} onClick={()=>onViewDish(d)}/>
+                ))}
+              </div>
             </div>
           )}
-          {/* Suggested recipe groups — always shown */}
-          <div className="mise-week-hr-top" style={{borderTop:`1px solid ${T.border}`,padding:"16px 16px 8px 0"}}>
-            <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.text,fontWeight:600,fontFamily:T.font}}>Suggested recipes for the week</div>
-          </div>
-          {recGroups.map((group,gi)=>(
+          {weekDishes.length===0&&recGroups.map((group,gi)=>(
             <div key={gi}>
-              <div className="mise-week-group-header mise-week-hr-top" style={{padding:"16px 16px 8px 0",display:"flex",alignItems:"center",gap:12,borderTop:`1px solid ${T.border}`}}>
-                <div style={{fontSize:20,fontWeight:600,color:T.text,fontFamily:T.fontTitle,flex:1,minWidth:0}}>{group.theme}</div>
+              <div className="mise-week-group-header mise-week-hr-top" style={{padding:"16px 0 8px 0",display:"flex",alignItems:"center",gap:12}}>
+                <div style={{fontSize:16,fontWeight:600,color:T.text,fontFamily:T.fontTitle,flex:1,minWidth:0}}>{group.theme}</div>
                 <button type="button" className="mise-week-add-all-btn" onClick={()=>{
                   setWeekDishIds(ids=>[...new Set([...ids,...group.dishes.map(d=>d.id)])]);
                   if(scrollRef.current) scrollRef.current.scrollTop=0;
-                }} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:100,padding:"0 12px",height:36,fontSize:12,fontFamily:T.font,color:T.text,cursor:"pointer",fontWeight:400,flexShrink:0}}>Add all 3</button>
+                }} style={{background:"none",border:`1.5px solid ${T.text}`,borderRadius:100,padding:"0 12px",height:36,fontSize:12,fontFamily:T.font,color:T.text,cursor:"pointer",fontWeight:400,flexShrink:0}}>Add all 3</button>
               </div>
-              <div className="mise-week-rec-group-dishes">
+              <div className="mise-recipe-grid">
                 {group.dishes.map(d=><DishRow key={d.id} dish={d} inWeek={weekDishIds.includes(d.id)} onToggleWeek={id=>setWeekDishIds(ids=>ids.includes(id)?ids.filter(i=>i!==id):[...ids,id])} onClick={()=>onViewDish(d)}/>)}
               </div>
             </div>
@@ -1185,106 +2191,187 @@ const ThisWeekTab = ({weekDishIds, setWeekDishIds, onViewDish, dishes}) => {
       )}
 
       {subTab==="shopping"&&(
-        <div style={{padding:"24px 16px 100px 0"}}>
+        <div className="mise-shopping-panel" style={{paddingBottom:100}}>
           {(()=>{
             const allItems = [
               ...compItems.map((i,idx)=>({...i,_type:"base",_key:"c"+idx})),
               ...dishItems.map((i,idx)=>({...i,_type:"dish",_key:"d"+idx}))
             ];
             const aisleGroups = groupByAisle(allItems);
-            return aisleGroups.map((group,gi)=>(
-              <div key={gi} style={{marginBottom:32}}>
-                <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.text,fontWeight:600,marginBottom:12}}>{group.label}</div>
-                {group.items.map((item,i)=>{
-                  const k=item._key;
-                  const ck=!!checkedItems[k];
-                  return(
-                    <div key={i} onClick={()=>ckItem(k)} style={{display:"flex",gap:16,padding:"8px 0",minHeight:40,alignItems:"flex-start",borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}>
-                      <Ck checked={ck} onClick={()=>ckItem(k)}/>
-                      <div style={{flex:1}}>
-                        <span style={{fontSize:14,color:ck?T.faint:T.text,textDecoration:ck?"line-through":"none",fontFamily:T.font}}>{item.item}</span>
-                        {item.note&&<span style={{fontSize:12,color:T.muted,marginLeft:8}}>{item.note}</span>}
+            const lastSectionIdx = aisleGroups.length - 1;
+            return aisleGroups.map((group,gi)=>{
+              const hasSectionBelow = gi < lastSectionIdx;
+              return(
+                <div key={gi} className="mise-shopping-section" style={{paddingRight:16,borderTop:gi>0?`1px solid ${T.border}`:"none"}}>
+                  <div className="mise-shopping-section-label" style={{fontSize:16,fontWeight:600,color:T.text,fontFamily:T.fontTitle}}>
+                    {group.label}
+                  </div>
+                  {group.items.map((item,itemIndex)=>{
+                    const k=item._key;
+                    const ck=!!checkedItems[k];
+                    const isLastItemInSection = itemIndex === group.items.length - 1;
+                    const hideBottomRule = isLastItemInSection && hasSectionBelow;
+                    const rowBorder = hideBottomRule ? "none" : `1px solid ${T.border}`;
+                    const padTop = itemIndex === 0 ? 0 : 8;
+                    const padBot = 8;
+                    const onRow = ()=>ckItem(k);
+                    return(
+                      <div
+                        key={item._key}
+                        className={`mise-shopping-item${itemIndex===0?" mise-shopping-item--first":""}`}
+                        style={{
+                          "--shop-row":String(itemIndex+1),
+                          borderBottom:rowBorder,
+                          boxSizing:"border-box",
+                          cursor:"pointer",
+                        }}
+                        onClick={onRow}
+                      >
+                        <div
+                          className="mise-shopping-item-body"
+                          style={{
+                            paddingTop:padTop,
+                            paddingBottom:padBot,
+                            minHeight:40,
+                            boxSizing:"border-box",
+                          }}
+                        >
+                          <div className="mise-shopping-row">
+                            <div className="mise-shopping-line-text">
+                              <div className="mise-shopping-name" style={{minWidth:0}}>
+                                <span style={{fontSize:14,lineHeight:"20px",color:ck?T.faint:T.text,textDecoration:ck?"line-through":"none",fontFamily:T.font}}>{item.item}</span>
+                                {item.note&&<span style={{fontSize:12,color:T.muted,marginLeft:8}}>{item.note}</span>}
+                              </div>
+                              <span className="mise-shopping-amt" style={{fontSize:12,color:T.text,fontFamily:T.font}}>{item.amount}</span>
+                            </div>
+                            <div className="mise-shopping-ck">
+                              <Ck checked={ck} onClick={(e)=>{e.stopPropagation();ckItem(k);}} marginTop={0}/>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <span style={{fontSize:12,color:T.text,fontFamily:T.font,flexShrink:0}}>{item.amount}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            ));
+                    );
+                  })}
+                </div>
+              );
+            });
           })()}
         </div>
       )}
 
       {subTab==="prep"&&(
-        <div style={{paddingBottom:100}}>
+        <div className="mise-prep-panel" style={{paddingBottom:100}}>
           {prepPlan.length===0&&sharedIngs.length===0&&(
             <div style={{color:T.muted,fontSize:14,textAlign:"left",padding:"60px 16px 60px 0",fontFamily:T.font}}>No shared bases to prep.</div>
           )}
           {prepPlan.length>0&&(
-            <div style={{padding:"0 16px 0 0"}}>
-              <div style={{paddingTop:24,paddingBottom:14}}>
-                <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.text,fontWeight:600,fontFamily:T.font}}>Bases to make</div>
-                
+            <div className="mise-prep-section mise-prep-section--bases" style={{paddingRight:16}}>
+              <div className="mise-prep-section-label" style={{fontSize:16,fontWeight:600,color:T.text,fontFamily:T.fontTitle}}>
+                Bases to make
               </div>
+              <div className="mise-prep-section-body--rest">
               {prepPlan.map((comp,ci)=>{
                 const k="p"+ci; const ck=!!checkedItems[k];
+                const isLastComp = ci === prepPlan.length - 1;
+                const sharedBelow = sharedIngs.length > 0;
+                const compBelow = ci < prepPlan.length - 1;
+                const hideCompBottomRule = isLastComp && sharedBelow;
                 return(
-                  <div key={comp.id} style={{borderBottom:`1px solid ${T.border}`,padding:"16px 0"}}>
-                    <div onClick={()=>ckItem(k)} style={{display:"flex",alignItems:"flex-start",gap:16,cursor:"pointer",marginBottom:8}}>
-                      <Ck checked={ck} onClick={()=>ckItem(k)}/>
-                      <div style={{flex:1}}>
-                        <div style={{fontSize:14,fontWeight:600,color:ck?T.faint:T.text,textDecoration:ck?"line-through":"none",fontFamily:T.font,marginBottom:4}}>{comp.name}</div>
-                        <div style={{fontSize:12,color:T.muted,fontFamily:T.font,lineHeight:1.5,marginBottom:8}}>{comp.description}</div>
-                        <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:5}}>
-                          {comp.usedIn.map((t,i)=><span key={i} style={{fontSize:11,color:T.muted,background:"#F5F5F3",border:`1px solid ${T.border}`,borderRadius:4,padding:"4px 8px",fontFamily:T.font}}>{t}</span>)}
+                  <div key={comp.id} style={{borderBottom:hideCompBottomRule?"none":`1px solid ${T.border}`,padding:ci===0?"0 0 16px 0":"16px 0"}}>
+                    <div className="mise-prep-line-item" onClick={()=>ckItem(k)} style={{cursor:"pointer",marginBottom:8}}>
+                      <div className="mise-prep-line-body" style={{minHeight:40,boxSizing:"border-box"}}>
+                        <div className="mise-prep-line-row">
+                          <div className="mise-prep-line-text">
+                            <div className="mise-prep-line-name">
+                              <div style={{fontSize:14,fontWeight:600,color:ck?T.faint:T.text,textDecoration:ck?"line-through":"none",fontFamily:T.font}}>{comp.name}</div>
+                              {comp.groupLabels?.length>0&&(
+                                <div style={{fontSize:12,color:T.muted,fontFamily:T.font,marginTop:2,lineHeight:"16px"}}>{comp.groupLabels.join(" · ")}</div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="mise-prep-line-ck">
+                            <Ck checked={ck} onClick={(e)=>{e.stopPropagation();ckItem(k);}} marginTop={0}/>
+                          </div>
                         </div>
-                        <div style={{display:"flex",gap:8}}>
-                          <span style={{fontSize:11,color:T.text,fontFamily:T.font,textTransform:"uppercase",letterSpacing:"0.06em"}}>{comp.cookTime} min</span>
-                          <span style={{color:T.border}}>·</span>
-                          <span style={{fontSize:11,color:T.text,fontFamily:T.font}}>Up to {comp.days} day{comp.days!==1?"s":""} ahead</span>
+                        <div style={{paddingLeft:34,marginTop:4}}>
+                          <div style={{fontSize:12,color:T.muted,fontFamily:T.font,lineHeight:1.5,marginBottom:8}}>{comp.description}</div>
+                          <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:5}}>
+                            {comp.usedIn.map((t,i)=><span key={i} style={{fontSize:11,color:T.muted,background:"#F5F5F3",border:`1px solid ${T.border}`,borderRadius:4,padding:"4px 8px",fontFamily:T.font}}>{t}</span>)}
+                          </div>
+                          <div style={{display:"flex",gap:8}}>
+                            <span style={{fontSize:11,color:T.text,fontFamily:T.font,textTransform:"uppercase",letterSpacing:"0.06em"}}>{comp.cookTime} min</span>
+                            <span style={{color:T.border}}>·</span>
+                            <span style={{fontSize:11,color:T.text,fontFamily:T.font}}>Up to {comp.days} day{comp.days!==1?"s":""} ahead</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div style={{paddingLeft:40}}>
-                      {comp.ingredients.map((ing,ii)=>{const ik=k+"i"+ii;const ikCk=!!checkedItems[ik];return(
-                        <div key={ii} onClick={()=>ckItem(ik)} style={{display:"flex",alignItems:"flex-start",gap:8,padding:"8px 0",minHeight:40,borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}>
-                          <Ck checked={ikCk} onClick={()=>ckItem(ik)}/>
-                          <div style={{flex:1,minWidth:0}}>
-                            <span style={{fontSize:12,color:ikCk?T.faint:T.text,textDecoration:ikCk?"line-through":"none",fontFamily:T.font}}>
-                              {ing.item}{ing.note?<span style={{color:T.muted}}> — {ing.note}</span>:""}
-                            </span>
-                            {ing._onlyForRecipes?.length>0&&(
-                              <div style={{fontSize:11,color:T.muted,fontFamily:T.font,marginTop:2}}>
-                                Only needed for: {ing._onlyForRecipes.join(" · ")}
+                      {comp.ingredients.map((ing,j)=>{
+                        const ii=j;
+                        const ik=k+"i"+ii;const ikCk=!!checkedItems[ik];
+                        const isLastIng = ii === comp.ingredients.length - 1;
+                        const hideIngBottomRule = isLastIng && (compBelow || isLastComp);
+                        return(
+                        <div key={ii} className="mise-prep-line-item" onClick={()=>ckItem(ik)} style={{borderBottom:hideIngBottomRule?"none":`1px solid ${T.border}`,cursor:"pointer"}}>
+                          <div className="mise-prep-line-body" style={{paddingTop:ii===0?0:8,paddingBottom:8,minHeight:40,boxSizing:"border-box"}}>
+                            <div className="mise-prep-line-row">
+                              <div className="mise-prep-line-text">
+                                <div className="mise-prep-line-name">
+                                  <span style={{fontSize:12,lineHeight:"20px",color:ikCk?T.faint:T.text,textDecoration:ikCk?"line-through":"none",fontFamily:T.font}}>
+                                    {ing.item}{ing.note?<span style={{color:T.muted}}> — {ing.note}</span>:""}
+                                  </span>
+                                  {ing._onlyForRecipes?.length>0&&(
+                                    <div style={{fontSize:11,color:T.muted,fontFamily:T.font,marginTop:2}}>
+                                      Only needed for: {ing._onlyForRecipes.join(" · ")}
+                                    </div>
+                                  )}
+                                </div>
+                                <span className="mise-prep-line-amt" style={{fontSize:12,color:T.muted,fontFamily:T.font}}>{ing.amount}</span>
                               </div>
-                            )}
+                              <div className="mise-prep-line-ck">
+                                <Ck checked={ikCk} onClick={(e)=>{e.stopPropagation();ckItem(ik);}} marginTop={0}/>
+                              </div>
+                            </div>
                           </div>
-                          <span style={{fontSize:12,color:T.muted,fontFamily:T.font,flexShrink:0}}>{ing.amount}</span>
                         </div>
-                      );})}
+                      );
+                    })}
                     </div>
                   </div>
                 );
               })}
+              </div>
             </div>
           )}
           {sharedIngs.length>0&&(
-            <div style={{padding:"0 16px 0 0",borderTop:`1px solid ${T.border}`}}>
-              <div style={{padding:"24px 0 12px"}}>
-                <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.text,fontWeight:600,fontFamily:T.font}}>Shared ingredients</div>
-                
+            <div className="mise-prep-section mise-prep-section--shared" style={{paddingRight:16,borderTop:`1px solid ${T.border}`}}>
+              <div className="mise-prep-section-label" style={{fontSize:16,fontWeight:600,color:T.text,fontFamily:T.fontTitle}}>
+                Shared ingredients
               </div>
+              <div className="mise-prep-section-body--rest">
               {sharedIngs.map((ing,i)=>{const k="si"+i;const ck=!!checkedItems[k];return(
-                <div key={i} onClick={()=>ckItem(k)} style={{display:"flex",alignItems:"flex-start",gap:16,padding:"12px 0",borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}>
-                  <Ck checked={ck} onClick={()=>ckItem(k)}/>
-                  <div style={{flex:1}}>
-                    <span style={{fontSize:14,fontWeight:600,color:ck?T.faint:T.text,textDecoration:ck?"line-through":"none",fontFamily:T.font}}>{ing.item}</span>
-                    <div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:4}}>
-                      {ing.recipes.map((r,ri)=><span key={ri} style={{fontSize:11,color:T.muted,background:"#F5F5F3",border:`1px solid ${T.border}`,borderRadius:4,padding:"2px 8px",fontFamily:T.font}}>{r}</span>)}
+                <div key={i} className="mise-prep-line-item" onClick={()=>ckItem(k)} style={{borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}>
+                  <div className="mise-prep-line-body" style={{paddingTop:i===0?0:12,paddingBottom:12,minHeight:40,boxSizing:"border-box"}}>
+                    <div className="mise-prep-line-row">
+                      <div className="mise-prep-line-text">
+                        <div className="mise-prep-line-name">
+                          <span style={{fontSize:14,lineHeight:"20px",fontWeight:600,color:ck?T.faint:T.text,textDecoration:ck?"line-through":"none",fontFamily:T.font}}>{ing.item}</span>
+                        </div>
+                      </div>
+                      <div className="mise-prep-line-ck">
+                        <Ck checked={ck} onClick={(e)=>{e.stopPropagation();ckItem(k);}} marginTop={0}/>
+                      </div>
+                    </div>
+                    <div style={{paddingLeft:34,marginTop:4}}>
+                      <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+                        {ing.recipes.map((r,ri)=><span key={ri} style={{fontSize:11,color:T.muted,background:"#F5F5F3",border:`1px solid ${T.border}`,borderRadius:4,padding:"2px 8px",fontFamily:T.font}}>{r}</span>)}
+                      </div>
                     </div>
                   </div>
                 </div>
               );})}
+              </div>
             </div>
           )}
         </div>
@@ -1298,7 +2385,7 @@ const ProfileTab = ({dishes}) => (
   <div className="mise-profile-tab" style={{flex:1,overflowY:"auto"}}>
     <div style={{borderBottom:`1px solid ${T.border}`,padding:"28px 16px 28px 0"}}>
       <div style={{width:48,height:48,borderRadius:"50%",background:T.border,marginBottom:10,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:16,color:T.muted}}>P</span></div>
-      <div style={{fontSize:20,fontWeight:600,color:T.text,fontFamily:T.font}}>Paul</div>
+      <div style={{fontSize:16,fontWeight:600,color:T.text,fontFamily:T.font}}>Paul</div>
     </div>
     <div style={{padding:"24px 16px 12px 0"}}><div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.muted,fontWeight:600}}>Base library</div></div>
     {Object.values(COMPONENT_LIBRARY).map(comp=>(
@@ -1324,30 +2411,52 @@ const ProfileTab = ({dishes}) => (
 
 const MISE_STORAGE_KEY = "mise-app-state";
 
-const CATALOG_BY_ID = Object.fromEntries(INITIAL_DISHES.map((d) => [d.id, d]));
+const isValidDishRecord = (d) =>
+  d != null && typeof d === "object" && typeof d.id === "string" && d.id.length > 0;
+
+const CATALOG_BY_ID = Object.fromEntries(
+  INITIAL_DISHES.filter(isValidDishRecord).map((d) => [d.id, d]),
+);
 const CATALOG_BY_SOURCE = (() => {
   const m = {};
   for (const d of INITIAL_DISHES) {
+    if (!isValidDishRecord(d)) continue;
     const k = normalizeRecipePageKey(d.sourceUrl || "");
     if (k) m[k] = d;
   }
   return m;
 })();
 
+const normalizeWeekDishIds = (weekDishIds, dishes) => {
+  const ids = new Set((dishes || []).filter(isValidDishRecord).map((d) => d.id));
+  return (weekDishIds || []).filter((id) => typeof id === "string" && ids.has(id));
+};
+
 /**
- * Point catalog dishes at bundled hero URLs. Always prefer the catalog image (by id or sourceUrl)
- * so stale/broken URLs in localStorage or imports don’t hide the photo.
+ * Point catalog dishes at bundled hero URLs. When a row matches the bundled catalog (by id or
+ * sourceUrl), prefer catalog recipe fields so instruction/content updates in INITIAL_DISHES apply
+ * even if the user has older rows in localStorage—only `image` used to do this, so steps stayed stale.
  */
-const enrichDishesFromCatalog = (dishes) =>
-  dishes.map((d) => {
+const enrichDishesFromCatalog = (dishes) => {
+  const raw = Array.isArray(dishes) ? dishes : [];
+  const list = raw.filter(isValidDishRecord);
+  if (!list.length) {
+    return raw.length > 0 ? INITIAL_DISHES : [];
+  }
+  return list.map((d) => {
     let canon = CATALOG_BY_ID[d.id];
     if (!canon && d.sourceUrl) {
       const key = normalizeRecipePageKey(d.sourceUrl);
       if (key) canon = CATALOG_BY_SOURCE[key];
     }
-    if (!canon?.image) return d;
-    return { ...d, image: canon.image };
+    if (!canon) return d;
+    return {
+      ...d,
+      ...canon,
+      image: canon.image || d.image,
+    };
   });
+};
 
 const loadPersistedState = () => {
   try {
@@ -1367,9 +2476,13 @@ const loadPersistedState = () => {
 
 const __miseHydrated = (() => {
   const p = loadPersistedState();
-  return p
-    ? { dishes: enrichDishesFromCatalog(p.dishes), weekDishIds: p.weekDishIds }
-    : { dishes: INITIAL_DISHES, weekDishIds: [] };
+  if (!p) return { dishes: INITIAL_DISHES, weekDishIds: [] };
+  const dishes = enrichDishesFromCatalog(p.dishes);
+  const safeDishes = dishes.length > 0 ? dishes : INITIAL_DISHES;
+  return {
+    dishes: safeDishes,
+    weekDishIds: normalizeWeekDishIds(p.weekDishIds, safeDishes),
+  };
 })();
 
 // ─── App ──────────────────────────────────────────────────────────────────────
@@ -1450,10 +2563,106 @@ export default function App() {
         .mise-app-header {
           width: 100%;
           box-sizing: border-box;
+          min-height: 64px;
+          padding: 0 16px 0 80px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-shrink: 0;
+          position: relative;
         }
         .mise-app-main {
           width: 100%;
           box-sizing: border-box;
+        }
+
+        .mise-recipes-sticky {
+          box-sizing: border-box;
+          padding: 0 16px 0 0;
+        }
+        .mise-recipes-sticky-row {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          min-height: 64px;
+          box-sizing: border-box;
+        }
+        .mise-week-subtabs,
+        .mise-detail-tabbar {
+          min-height: 64px;
+          align-items: center;
+          box-sizing: border-box;
+        }
+        .mise-week-dishes-sub .mise-week-group-header.mise-week-hr-top {
+          margin-top: 16px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        .mise-week-dishes-sub .mise-week-group-header .mise-week-add-all-btn {
+          margin-left: auto;
+        }
+        .mise-week-dishes-sub .mise-recipe-grid:empty {
+          padding: 0 !important;
+          margin: 0;
+          min-height: 0;
+        }
+
+        .mise-shopping-section-label,
+        .mise-prep-section-label {
+          padding-top: 24px;
+          padding-bottom: 12px;
+        }
+        .mise-prep-section--bases .mise-prep-section-label {
+          padding-bottom: 14px;
+        }
+
+        .mise-shopping-panel .mise-shopping-item,
+        .mise-prep-panel .mise-prep-line-item {
+          display: block;
+          min-width: 0;
+        }
+        .mise-shopping-panel .mise-shopping-item-body,
+        .mise-prep-panel .mise-prep-line-body {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-width: 0;
+        }
+        .mise-shopping-panel .mise-shopping-row,
+        .mise-prep-panel .mise-prep-line-row {
+          position: relative;
+          box-sizing: border-box;
+          width: 100%;
+          min-width: 0;
+          padding-left: 34px;
+        }
+        .mise-shopping-panel .mise-shopping-line-text,
+        .mise-prep-panel .mise-prep-line-text {
+          display: flex;
+          flex-direction: row;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 16px;
+          min-width: 0;
+        }
+        .mise-shopping-panel .mise-shopping-name,
+        .mise-prep-panel .mise-prep-line-name {
+          flex: 1;
+          min-width: 0;
+        }
+        .mise-shopping-panel .mise-shopping-amt,
+        .mise-prep-panel .mise-prep-line-amt {
+          flex-shrink: 0;
+        }
+        .mise-shopping-panel .mise-shopping-ck,
+        .mise-prep-panel .mise-prep-line-ck {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
         }
 
         .mise-recipes-filters {
@@ -1564,6 +2773,68 @@ export default function App() {
         .mise-detail-hero-toolbar {
           display: none;
         }
+        .mise-detail-hero-visual-inner {
+          width: 100%;
+          aspect-ratio: 3 / 2;
+          height: auto;
+        }
+        .mise-detail-hero-banner {
+          box-sizing: border-box;
+          width: 100%;
+          padding-left: 0;
+          padding-right: 16px;
+        }
+        .mise-detail-hero-banner .mise-detail-hero-visual {
+          width: 100%;
+        }
+        .mise-detail-body-cols {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        .mise-detail-main-col {
+          min-width: 0;
+          width: 100%;
+          padding-bottom: 80px;
+          box-sizing: border-box;
+        }
+        .mise-instruction-step {
+          display: grid;
+          grid-template-columns: minmax(20px, auto) minmax(0, 1fr) minmax(92px, 26%);
+          gap: 8px 16px;
+          align-items: start;
+        }
+        .mise-instruction-step__idx {
+          font-size: 12px;
+          color: rgba(0, 51, 160, 0.45);
+          font-weight: 600;
+          padding-top: 2px;
+          text-align: center;
+          font-family: 'Poppins', sans-serif;
+        }
+        .mise-instruction-step__body {
+          font-size: 14px;
+          color: #0033A0;
+          line-height: 1.7;
+          margin: 0;
+          font-family: 'Poppins', sans-serif;
+        }
+        .mise-instruction-step__timing {
+          grid-column: 3;
+          padding-top: 2px;
+          text-align: right;
+          align-self: start;
+          min-height: 1.45em;
+        }
+        .mise-instruction-step__timing-value {
+          font-size: 12px;
+          line-height: 1.45;
+          color: rgba(0, 51, 160, 0.5);
+          font-family: 'Poppins', sans-serif;
+          text-align: right;
+          display: block;
+        }
         .mise-detail-title {
           overflow-wrap: break-word;
           word-break: break-word;
@@ -1597,7 +2868,7 @@ export default function App() {
             padding-left: calc(80px + 64px) !important;
             padding-right: 64px !important;
           }
-          .mise-recipes-sticky { padding: 12px 0 !important; }
+          .mise-recipes-sticky { padding: 0 !important; }
           .mise-recipes-filters,
           .mise-recipes-filters--open {
             padding-right: 0 !important;
@@ -1609,24 +2880,70 @@ export default function App() {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             align-items: stretch;
           }
-          .mise-week-rec-group-dishes {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
-            padding: 0 0 8px 0;
-            align-items: stretch;
+          .mise-week-dishes-sub .mise-recipe-grid {
+            padding-bottom: 8px;
           }
           .mise-week-tab .mise-week-subtabs {
             margin-bottom: 16px;
           }
+          .mise-prep-panel .mise-prep-section {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+            grid-template-rows: auto;
+            column-gap: 32px;
+            row-gap: 0;
+            align-items: baseline;
+            padding-top: 24px;
+            margin-top: 0;
+            box-sizing: border-box;
+          }
+          .mise-shopping-panel .mise-shopping-section {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+            column-gap: 32px;
+            row-gap: 0;
+            align-items: baseline;
+            padding-top: 24px;
+            margin-top: 0;
+            box-sizing: border-box;
+          }
+          .mise-shopping-panel .mise-shopping-section > .mise-shopping-item {
+            grid-column: 2;
+            grid-row: var(--shop-row);
+            min-width: 0;
+          }
+          .mise-prep-panel .mise-prep-section:not(:first-child),
+          .mise-shopping-panel .mise-shopping-section:not(:first-child) {
+            margin-top: 16px;
+          }
+          .mise-prep-panel .mise-prep-section-label {
+            grid-column: 1;
+            grid-row: 1;
+            align-self: baseline;
+            padding-right: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            line-height: 20px;
+          }
+          .mise-shopping-panel .mise-shopping-section-label {
+            grid-column: 1;
+            grid-row: 1;
+            align-self: baseline;
+            padding-right: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            line-height: 20px;
+          }
+          .mise-prep-panel .mise-prep-section-body--rest {
+            grid-column: 2;
+            grid-row: 1;
+            min-width: 0;
+          }
           .mise-week-dishes-sub .mise-week-banner {
-            margin-bottom: 16px;
+            margin-bottom: 0;
           }
           .mise-week-dishes-sub .mise-week-hr-top {
             margin-top: 16px;
-          }
-          .mise-week-dishes-sub .mise-week-group-header .mise-week-add-all-btn {
-            margin-left: auto;
           }
           .mise-week-tab,
           .mise-profile-tab {
@@ -1642,45 +2959,51 @@ export default function App() {
             right: 64px !important;
             display: none !important;
           }
-          .mise-detail-hero {
+          .mise-detail-hero-banner {
+            width: 100%;
+            box-sizing: border-box;
+            padding-left: 16px;
+            padding-right: 16px;
+          }
+          .mise-detail-hero-visual-inner {
+            aspect-ratio: unset;
+            height: 320px;
+          }
+          .mise-detail-body-cols {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-            gap: 24px;
-            align-items: end;
+            gap: 64px;
+            align-items: start;
             box-sizing: border-box;
             padding-left: 16px;
             padding-right: 16px;
             width: 100%;
           }
-          .mise-detail-hero-visual {
-            grid-column: 2;
-            grid-row: 1;
-            min-width: 0;
-          }
           .mise-detail-hero-copy {
-            grid-column: 1;
-            grid-row: 1;
             min-width: 0;
-            max-width: none;
-            width: 100%;
+            overflow-wrap: break-word;
             padding-top: 24px !important;
-            padding-bottom: 24px !important;
+            padding-bottom: 8px !important;
             padding-left: 0 !important;
             padding-right: 0 !important;
-            overflow-wrap: break-word;
           }
-          .mise-detail-tabbar {
-            padding-left: 16px !important;
-            padding-right: 16px !important;
+          .mise-detail-main-col {
+            min-width: 0;
+            padding-top: 8px;
+            padding-bottom: 80px;
+            box-sizing: border-box;
           }
+          .mise-detail-tabbar,
           .mise-detail-ingredients,
-          .mise-detail-instructions {
-            padding-left: 16px !important;
-            padding-right: 16px !important;
-          }
-          .mise-detail-notes {
-            padding-left: 16px !important;
-            padding-right: 16px !important;
+          .mise-detail-instructions,
+          .mise-detail-notes,
+          .mise-detail-tags {
+            max-width: none;
+            margin-left: 0;
+            margin-right: 0;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            box-sizing: border-box;
           }
           .mise-detail-title-side-actions {
             display: none !important;
@@ -1688,12 +3011,10 @@ export default function App() {
           .mise-detail-hero-toolbar {
             display: flex !important;
           }
-          .mise-recipe-grid .mise-dish-row,
-          .mise-week-rec-group-dishes .mise-dish-row {
+          .mise-dish-row {
             flex-direction: column;
             align-items: stretch;
             width: 100%;
-            height: 100%;
             min-height: 0;
             gap: 0;
             padding: 0;
@@ -1703,9 +3024,14 @@ export default function App() {
             background: #fff;
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
             border-bottom: none;
+            box-sizing: border-box;
+            margin-bottom: 16px;
           }
-          .mise-recipe-grid .mise-dish-media,
-          .mise-week-rec-group-dishes .mise-dish-media {
+          .mise-recipe-grid .mise-dish-row {
+            height: 100%;
+            margin-bottom: 0;
+          }
+          .mise-dish-media {
             width: 100%;
             height: auto;
             aspect-ratio: 3 / 2;
@@ -1713,10 +3039,8 @@ export default function App() {
             border-radius: 0;
             cursor: pointer;
           }
-          .mise-recipe-grid .mise-dish-blob,
-          .mise-week-rec-group-dishes .mise-dish-blob { display: none; }
-          .mise-recipe-grid .mise-dish-footer,
-          .mise-week-rec-group-dishes .mise-dish-footer {
+          .mise-dish-blob { display: none; }
+          .mise-dish-footer {
             flex: 1 1 auto;
             min-height: 0;
             width: 100%;
@@ -1725,18 +3049,15 @@ export default function App() {
             align-items: flex-start;
             gap: 16px;
           }
-          .mise-recipe-grid .mise-dish-title,
-          .mise-week-rec-group-dishes .mise-dish-title {
+          .mise-dish-title {
             white-space: normal;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             line-height: 1.35;
           }
-          .mise-recipe-grid .mise-dish-source,
-          .mise-week-rec-group-dishes .mise-dish-source { margin-top: 4px; }
-          .mise-recipe-grid .mise-dish-meta,
-          .mise-week-rec-group-dishes .mise-dish-meta { margin-top: 2px; }
+          .mise-dish-source { margin-top: 4px; }
+          .mise-dish-meta { margin-top: 2px; }
         }
         @media (min-width: 920px) {
           .mise-recipe-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1748,13 +3069,13 @@ export default function App() {
           .mise-recipe-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
         }
       `}</style>
-      <div className="mise-app-header" style={{background:T.surface,padding:"16px 16px 16px 80px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0,position:"relative",opacity:detailDish?0:1,transition:"opacity 0.25s ease",pointerEvents:detailDish?"none":"all"}}>
+      <div className="mise-app-header" style={{background:T.surface,opacity:detailDish?0:1,transition:"opacity 0.25s ease",pointerEvents:detailDish?"none":"all"}}>
         <div style={{fontSize:32,fontWeight:600,letterSpacing:"-0.01em",color:T.text,lineHeight:1,fontFamily:T.fontTitle}}>
           {activeTab==="recipes"?"Recipes":activeTab==="week"?"This Week":"Profile"}
         </div>
         <div className="mise-app-header-rule" aria-hidden="true"/>
-        {activeTab==="recipes"&&<button onClick={()=>setImportOpen(true)} style={{background:T.text,color:"#fff",border:"none",borderRadius:100,padding:"0 16px",height:36,fontSize:12,fontFamily:T.font,fontWeight:600,cursor:"pointer"}}>+ Add</button>}
-        {activeTab==="week"&&<span style={{fontSize:12,color:T.muted}}>{weekDishIds.length} dish{weekDishIds.length!==1?"es":""}</span>}
+        {activeTab==="recipes"&&<button onClick={()=>setImportOpen(true)} style={{background:T.text,color:"#fff",border:"none",borderRadius:100,padding:"0 16px",height:36,fontSize:12,fontFamily:T.font,fontWeight:600,cursor:"pointer",flexShrink:0}}>+ Add</button>}
+        {activeTab==="week"&&<span style={{fontSize:12,color:T.muted,lineHeight:1,fontFamily:T.font}}>{weekDishIds.length} dish{weekDishIds.length!==1?"es":""}</span>}
       </div>
       <div ref={mainScrollRef} className="mise-app-main" style={{flex:1,overflow:"hidden",display:"flex",flexDirection:"column",paddingLeft:80,opacity:detailDish?0:1,transition:"opacity 0.25s ease",pointerEvents:detailDish?"none":"all"}}>
         {activeTab==="recipes"&&<RecipesTab weekDishIds={weekDishIds} onToggleWeek={handleToggleWeek} onViewDish={setDetailDish} dishes={dishes} initialTag={recipeActiveTag} onTagApplied={()=>setRecipeActiveTag(null)}/>}
@@ -1877,11 +3198,8 @@ export default function App() {
                 {(d.original?.steps||[]).length>0&&(
                   <div style={{marginTop:32}}>
                     <div style={{fontSize:11,letterSpacing:"0.1em",textTransform:"uppercase",color:T.muted,fontWeight:600,marginBottom:16}}>Instructions</div>
-                    {(d.original.steps||[]).map((step,i)=>(
-                      <div key={i} style={{display:"flex",gap:16,marginBottom:20}}>
-                        <span style={{fontSize:12,color:T.muted,fontWeight:600,width:18,flexShrink:0,paddingTop:2,textAlign:"center"}}>{String(i+1).padStart(2,"0")}</span>
-                        <p style={{fontSize:14,color:T.text,lineHeight:1.7,margin:0,flex:1,fontFamily:T.font}}>{step}</p>
-                      </div>
+                    {computeInstructionRows(d.original.steps, d, d.original?.ingredients).map((row, i) => (
+                      <InstructionStepRow key={i} row={row} index={i} marginBottom={20} />
                     ))}
                   </div>
                 )}
